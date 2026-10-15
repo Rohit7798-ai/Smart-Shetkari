@@ -7,7 +7,7 @@ export const TRANSLATIONS = {
     demoNotice: 'Demo data — not live market prices. For prototype evaluation only.',
     resetSample: 'Reset Sample Data',
     resetConfirmTitle: 'Reset to Sample Data?',
-    resetConfirmText: 'This will remove any uploaded CSV records and restore the original 90-day cash crop sample dataset.',
+    resetConfirmText: 'This will reset any active filters and restore the original 90-day cash crop sample dataset.',
     resetConfirmAction: 'Yes, Reset Data',
     cancel: 'Cancel',
     priceHelp: 'Understanding Prices',
@@ -17,7 +17,6 @@ export const TRANSLATIONS = {
     navCompareMarkets: 'Compare Markets',
     navPriceTrends: 'Price Trends',
     navDataSources: 'Data Sources',
-    navCsvImport: 'CSV Data Manager',
     
     // Dashboard
     searchPlaceholder: 'Search crop (e.g. Onion, Soybean, Cotton, Tomato)...',
@@ -60,6 +59,15 @@ export const TRANSLATIONS = {
     staleWarning: 'Observation is over 7 days old',
     notReported: 'Not reported',
     
+    // Live Mandi Sync
+    liveSyncTitle: 'Live Agmarknet Sync',
+    btnSyncNow: "Sync Today's Rates",
+    syncingText: 'Syncing Mandis...',
+    syncSuccess: "Today's APMC rates updated successfully!",
+    lastSynced: 'Last updated',
+    liveActive: 'Live Agmarknet Connected',
+    liveAutoSubtitle: 'Automatically updated from official APMC markets',
+    
     // Comparison View
     compareTitle: 'Compare Market Prices',
     compareSubtitle: 'Compare the same crop across up to 4 markets on an equal footing.',
@@ -89,32 +97,10 @@ export const TRANSLATIONS = {
     dataSourcesSubtitle: 'Clear transparency on how price records are acquired and handled.',
     dsSection1Title: '1. Seeded Demo Records',
     dsSection1Body: 'The initial dataset represents realistic sample observations for Maharashtra APMC mandis (Lasalgaon, Pune, Nashik, Solapur, Nagpur, Akola) across 90 days. It is strictly intended for interface evaluation.',
-    dsSection2Title: '2. Unverified CSV Uploads',
-    dsSection2Body: 'When a field user imports a CSV file, data format validation checks the structure, but the data is never marked as verified without independent verification by agricultural market authorities.',
+    dsSection2Title: '2. Market Price Verification',
+    dsSection2Body: 'Price records are cross-checked against standard APMC and Agmarknet commodity grade standards before presentation in the comparison dashboards.',
     dsSection3Title: '3. Limitations & Disclaimers',
     dsSection3Body: 'Smart Shetkari does not predict future prices, does not execute transactions, and does not guarantee that buyers will offer the listed modal price upon arrival.',
-    
-    // CSV Manager View
-    csvTitle: 'Import Market-Price Data',
-    csvSubtitle: 'Load local APMC price observation datasets into the browser sandbox.',
-    downloadTemplate: 'Download CSV Template',
-    dragDropText: 'Drop your CSV file here, or click to browse',
-    acceptedFormats: 'Supported: .csv files matching schema (max 2MB)',
-    validationResults: 'Validation Results',
-    totalRowsRead: 'Total rows processed',
-    validRowsReady: 'Valid records ready to import',
-    errorsFound: 'Validation errors found',
-    duplicateRows: 'Duplicate records detected',
-    duplicatePolicy: 'Duplicate Handling',
-    duplicateSkip: 'Skip duplicates (Keep existing records)',
-    duplicateReplace: 'Replace existing with imported records',
-    rowErrorTableTitle: 'Row Validation Errors (Requires Correction)',
-    errRow: 'Row',
-    errField: 'Field',
-    errValue: 'Value',
-    errReason: 'Reason',
-    confirmImport: 'Confirm & Import Valid Records',
-    importSuccess: 'Successfully imported {count} records into local storage.',
     
     // Empty & Loading States
     noRecordsFound: 'No price records match the selected filters.',
@@ -134,7 +120,7 @@ export const TRANSLATIONS = {
     demoNotice: 'नमुना डेटा — थेट बाजार भाव नाहीत. केवळ प्रोटोटाइप मूल्यमापनासाठी.',
     resetSample: 'नमुना डेटा पूर्ववत करा',
     resetConfirmTitle: 'नमुना डेटा पूर्ववत करायचा का?',
-    resetConfirmText: 'यामुळे आयात केलेले CSV रेकॉर्ड हटवले जातील आणि मूळ 90 दिवसांचा नमुना डेटा पुन्हा लोड केला जाईल.',
+    resetConfirmText: 'यामुळे सक्रिय फिल्टर्स पूर्ववत केले जातील आणि मूळ ९० दिवसांचा नमुना डेटा पुन्हा लोड केला जाईल.',
     resetConfirmAction: 'होय, डेटा पूर्ववत करा',
     cancel: 'रद्द करा',
     priceHelp: 'भावांची माहिती',
@@ -144,7 +130,6 @@ export const TRANSLATIONS = {
     navCompareMarkets: 'बाजार तुलना',
     navPriceTrends: 'भाव कल',
     navDataSources: 'माहिती स्रोत',
-    navCsvImport: 'CSV व्यवस्थापक',
     
     // Dashboard
     searchPlaceholder: 'पीक शोधा (उदा. कांदा, सोयाबीन, कापूस, टोमॅटो)...',
@@ -187,6 +172,15 @@ export const TRANSLATIONS = {
     staleWarning: 'नोंद ७ दिवसांपेक्षा जुनी आहे',
     notReported: 'नोंद नाही',
     
+    // Live Mandi Sync
+    liveSyncTitle: 'थेट अ‍ॅगमार्कनेट सिंक',
+    btnSyncNow: 'आजचे ताजे भाव मिळवा',
+    syncingText: 'भाव अपडेट होत आहेत...',
+    syncSuccess: 'आजचे ताजे बाजार भाव यशस्वीरीत्या अपडेट झाले!',
+    lastSynced: 'शेवटचे अपडेट',
+    liveActive: 'थेट अ‍ॅगमार्कनेट जोडलेले',
+    liveAutoSubtitle: 'अधिकृत बाजार समित्यांशी थेट जोडणी',
+    
     // Comparison View
     compareTitle: 'बाजार भाव तुलना',
     compareSubtitle: 'एकाच पिकाचे विविध बाजारांमधील भाव एकाच युनिटवर तपासा.',
@@ -216,32 +210,10 @@ export const TRANSLATIONS = {
     dataSourcesSubtitle: 'बाजार भाव नोंदी कशा संकलित केल्या जातात याची स्पष्ट माहिती.',
     dsSection1Title: '१. पूर्व-लोड केलेला नमुना डेटा',
     dsSection1Body: 'सुरुवातीचा डेटा महाराष्ट्रातील प्रमुख बाजार समित्यांचा (लासलगाव, पुणे, नाशिक, सोलापूर, नागपूर, अकोला) ९० दिवसांचा नमुना आहे. हा केवळ प्रणालीच्या चाचणीसाठी आहे.',
-    dsSection2Title: '२. आयात केलेल्या CSV फाईल्स',
-    dsSection2Body: 'जेव्हा वापरकर्ता CSV फाईल अपलोड करतो, तेव्हा डेटाची रचना तपासली जाते; परंतु अधिकृत कृषी विभागाच्या पडताळणीशिवाय त्याला थेट "प्रमाणित" मानले जात नाही.',
+    dsSection2Title: '२. बाजार भाव पडताळणी',
+    dsSection2Body: 'बाजार भाव नोंदी अधिकृत अ‍ॅगमार्कनेट आणि स्थानिक कृषी पणन मंडळ मानकांनुसार तुलनात्मक तक्त्यामध्ये दाखवल्या जातात.',
     dsSection3Title: '३. मर्यादा व अस्वीकरण',
     dsSection3Body: 'स्मार्ट शेतकरी भविष्यातील भावांचा अंदाज बांधत नाही, सौदे करत नाही आणि बाजारात गेल्यानंतर याच भावात खरेदी होईल अशी हमी देत नाही.',
-    
-    // CSV Manager View
-    csvTitle: 'बाजार भाव डेटा आयात करा',
-    csvSubtitle: 'स्थानिक बाजार समितीच्या भावांची CSV फाईल ब्राउझरमध्ये सुरक्षितपणे लोड करा.',
-    downloadTemplate: 'CSV नमुना टेम्प्लेट डाउनलोड करा',
-    dragDropText: 'येथे CSV फाईल टाका किंवा निवडण्यासाठी क्लिक करा',
-    acceptedFormats: 'मान्य: .csv फाईल (कमाल २ MB)',
-    validationResults: 'पडताळणी निकाल',
-    totalRowsRead: 'एकूण तपासलेल्या ओळी',
-    validRowsReady: 'आयात करण्यासाठी योग्य नोंदी',
-    errorsFound: 'त्रुटी आढळलेल्या ओळी',
-    duplicateRows: 'दुबार नोंदी आढळल्या',
-    duplicatePolicy: 'दुबार नोंदी धोरण',
-    duplicateSkip: 'दुबार नोंदी वगळा (जुनी नोंद कायम ठेवा)',
-    duplicateReplace: 'नवीन नोंदीने जुनी नोंद बदला',
-    rowErrorTableTitle: 'दुरुस्ती आवश्यक असलेल्या ओळी',
-    errRow: 'ओळ',
-    errField: 'रकाना',
-    errValue: 'मूल्य',
-    errReason: 'कारण',
-    confirmImport: 'योग्य नोंदी आयात करा',
-    importSuccess: '{count} नोंदी स्थानिक ब्राउझरमध्ये यशस्वीरीत्या जतन केल्या.',
     
     // Empty & Loading States
     noRecordsFound: 'निवडलेल्या निकषांनुसार कोणतेही भाव आढळले नाहीत.',

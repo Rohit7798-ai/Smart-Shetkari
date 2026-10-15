@@ -329,20 +329,20 @@ export const MarketPricesView: React.FC<MarketPricesViewProps> = ({
           suggestions={
             lang === 'mr'
               ? [
+                  'आजचे ताजे भाव सिंक करा',
                   filters.selectedCrop
                     ? `${filters.selectedCrop} चे आजचे कमाल भाव दाखवा`
                     : 'आजचे कमाल भाव दाखवा',
                   'लासलगाव कांदा भाव काय आहे?',
                   'सर्वोत्तम भाव देणारा बाजार शोधा',
-                  'भावांचे प्रकार समजावून सांगा',
                 ]
               : [
+                  "Sync today's fresh live rates",
                   filters.selectedCrop
                     ? `Show highest price for ${filters.selectedCrop}`
                     : 'Show highest price today',
                   'What is Lasalgaon onion price?',
                   'Find highest paying market',
-                  'Explain modal price',
                 ]
           }
           onSelectSuggestion={onTriggerAssistantPrompt}

@@ -23,8 +23,6 @@ export const VoiceAssistantLauncher: React.FC<VoiceAssistantLauncherProps> = ({
         return lang === 'mr' ? 'बाजार तुलना' : 'Compare';
       case 'trends':
         return lang === 'mr' ? 'भाव कल' : 'Trends';
-      case 'csv':
-        return lang === 'mr' ? 'CSV आयात' : 'CSV Import';
       case 'sources':
         return lang === 'mr' ? 'डेटा स्रोत' : 'Sources';
       default:

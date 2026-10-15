@@ -8,7 +8,7 @@ export type AppActionType =
   | 'toggle_language'
   | 'open_price_help'
   | 'trigger_sample_reset'
-  | 'download_template'
+  | 'sync_live_prices'
   | 'guide_step';
 
 export interface AppAction {

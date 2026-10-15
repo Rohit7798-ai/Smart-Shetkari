@@ -6,7 +6,7 @@ export type DataStatus = 'demo' | 'imported_unverified' | 'verified';
 
 export type Language = 'en' | 'mr';
 
-export type NavTab = 'prices' | 'compare' | 'trends' | 'sources' | 'csv';
+export type NavTab = 'prices' | 'compare' | 'trends' | 'sources';
 
 export interface MarketPriceRecord {
   recordId: string;
@@ -27,20 +27,6 @@ export interface MarketPriceRecord {
   sourceUrl?: string;
   retrievedAt: string; // ISO format
   dataStatus: DataStatus;
-}
-
-export interface CsvValidationError {
-  rowNumber: number;
-  field: string;
-  value: string;
-  message: string;
-}
-
-export interface CsvValidationResult {
-  totalRows: number;
-  validRecords: MarketPriceRecord[];
-  errors: CsvValidationError[];
-  duplicateCount: number;
 }
 
 export interface FilterState {

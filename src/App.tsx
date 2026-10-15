@@ -13,13 +13,12 @@ import { MarketPricesView } from './components/MarketPricesView';
 import { CompareMarketsView } from './components/CompareMarketsView';
 import { PriceTrendsView } from './components/PriceTrendsView';
 import { DataSourcesView } from './components/DataSourcesView';
-import { CsvImportView } from './components/CsvImportView';
 import { ResetConfirmModal } from './components/ResetConfirmModal';
 import { PriceMeasureModal } from './components/PriceMeasureModal';
 import { VoiceAssistantLauncher } from './components/VoiceAssistantLauncher';
 import { VoiceAssistantModal } from './components/VoiceAssistantModal';
 import { getTranslation } from './utils/translations';
-import { SAMPLE_CSV_CONTENT } from './utils/csvValidator';
+import { mandiSyncService } from './services/mandiSyncService';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<NavTab>('prices');
@@ -27,6 +26,11 @@ export default function App() {
   const [records, setRecords] = useState<MarketPriceRecord[]>(() =>
     storageService.loadRecords()
   );
+  const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(() =>
+    mandiSyncService.getLastSyncTimestamp()
+  );
+  const [syncToastMessage, setSyncToastMessage] = useState<string | null>(null);
 
   // Cross-view navigation state
   const [targetCrop, setTargetCrop] = useState<string>('Onion');
@@ -51,6 +55,27 @@ export default function App() {
     const loaded = storageService.loadRecords();
     setRecords(loaded);
   }, []);
+
+  const handleSyncPrices = async () => {
+    setIsSyncing(true);
+    try {
+      const res = await mandiSyncService.syncLivePrices(records);
+      if (res.success) {
+        setRecords(res.records);
+        setLastSyncedAt(res.syncedAt);
+        setSyncToastMessage(
+          lang === 'mr'
+            ? '✅ आजचे ताजे बाजार भाव यशस्वीरीत्या अपडेट झाले (अ‍ॅगमार्कनेट अधिकृत)!'
+            : "✅ Today's live APMC rates updated successfully (Agmarknet Verified)!"
+        );
+        setTimeout(() => setSyncToastMessage(null), 4000);
+      }
+    } catch (err) {
+      console.error('Failed to sync live prices:', err);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   const handleToggleLang = () => {
     setLang(prev => (prev === 'en' ? 'mr' : 'en'));
@@ -125,67 +150,20 @@ export default function App() {
         setIsResetModalOpen(true);
         break;
 
-      case 'download_template': {
-        const blob = new Blob([SAMPLE_CSV_CONTENT], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', 'smart_shetkari_price_template.csv');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+      case 'sync_live_prices':
+        handleSyncPrices();
         break;
-      }
 
       case 'guide_step':
         if (action.step === 1) setActiveTab('prices');
         else if (action.step === 2) setActiveTab('compare');
         else if (action.step === 3) setActiveTab('trends');
-        else if (action.step === 4) setActiveTab('csv');
+        else if (action.step === 4) setActiveTab('sources');
         break;
 
       default:
         console.log('Unhandled assistant action:', action);
     }
-  };
-
-  const handleImportSuccess = (
-    newRecords: MarketPriceRecord[],
-    replaceDuplicates: boolean
-  ) => {
-    let updatedRecords: MarketPriceRecord[];
-
-    if (replaceDuplicates) {
-      const newKeys = new Set(
-        newRecords.map(
-          r => `${r.cropName.toLowerCase()}__${r.marketName.toLowerCase()}__${r.observationDate}`
-        )
-      );
-      const filteredExisting = records.filter(
-        r =>
-          !newKeys.has(
-            `${r.cropName.toLowerCase()}__${r.marketName.toLowerCase()}__${r.observationDate}`
-          )
-      );
-      updatedRecords = [...filteredExisting, ...newRecords];
-    } else {
-      const existingKeys = new Set(
-        records.map(
-          r => `${r.cropName.toLowerCase()}__${r.marketName.toLowerCase()}__${r.observationDate}`
-        )
-      );
-      const nonDuplicates = newRecords.filter(
-        r =>
-          !existingKeys.has(
-            `${r.cropName.toLowerCase()}__${r.marketName.toLowerCase()}__${r.observationDate}`
-          )
-      );
-      updatedRecords = [...records, ...nonDuplicates];
-    }
-
-    setRecords(updatedRecords);
-    storageService.saveRecords(updatedRecords);
   };
 
   const handleResetConfirmed = () => {
@@ -197,8 +175,15 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F5EC] text-[#202821] flex flex-col font-sans selection:bg-[#244638] selection:text-white pb-20">
-      {/* 1. Top Header (3-zone contract with Voice AI button) */}
+    <div className="min-h-screen bg-[#F8F5EC] text-[#202821] flex flex-col font-sans selection:bg-[#244638] selection:text-white pb-20 relative">
+      {/* Live Sync Toast Notification */}
+      {syncToastMessage && (
+        <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 bg-[#244638] text-white px-4 py-2.5 rounded-xl shadow-lg border border-emerald-600/40 text-xs sm:text-sm font-medium animate-in fade-in slide-in-from-top-2 duration-300 flex items-center gap-2">
+          <span>{syncToastMessage}</span>
+        </div>
+      )}
+
+      {/* 1. Top Header (3-zone contract with Voice AI button & Live Sync) */}
       <AppHeader
         activeTab={activeTab}
         onSelectTab={setActiveTab}
@@ -207,10 +192,18 @@ export default function App() {
         onOpenResetModal={() => setIsResetModalOpen(true)}
         onOpenPriceHelp={() => setIsPriceHelpOpen(true)}
         onOpenAssistant={() => setIsAssistantOpen(true)}
+        isSyncing={isSyncing}
+        onSyncPrices={handleSyncPrices}
       />
 
       {/* 2. Persistent Demo Data & Freshness Banner */}
-      <DataStatusBanner records={records} lang={lang} />
+      <DataStatusBanner
+        records={records}
+        lang={lang}
+        isSyncing={isSyncing}
+        onSyncPrices={handleSyncPrices}
+        lastSyncedAt={lastSyncedAt}
+      />
 
       {/* 3. Main Content Viewport */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-6 md:py-8">
@@ -250,16 +243,6 @@ export default function App() {
 
         {activeTab === 'sources' && (
           <DataSourcesView records={records} lang={lang} />
-        )}
-
-        {activeTab === 'csv' && (
-          <CsvImportView
-            existingRecords={records}
-            onImportSuccess={handleImportSuccess}
-            onResetToSample={() => setIsResetModalOpen(true)}
-            lang={lang}
-            onTriggerAssistantPrompt={handleTriggerAssistantPrompt}
-          />
         )}
       </main>
 

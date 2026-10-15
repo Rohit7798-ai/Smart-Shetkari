@@ -1,9 +1,7 @@
 import React from 'react';
-import { Language } from '../types/marketPrice';
+import { Language, NavTab } from '../types/marketPrice';
 import { getTranslation } from '../utils/translations';
-import { Globe, RotateCcw, HelpCircle, Sprout, MessageSquare } from 'lucide-react';
-
-export type NavTab = 'prices' | 'compare' | 'trends' | 'sources' | 'csv';
+import { Globe, RotateCcw, HelpCircle, Sprout, MessageSquare, RefreshCw } from 'lucide-react';
 
 interface AppHeaderProps {
   activeTab: NavTab;
@@ -13,6 +11,8 @@ interface AppHeaderProps {
   onOpenResetModal: () => void;
   onOpenPriceHelp: () => void;
   onOpenAssistant: () => void;
+  isSyncing?: boolean;
+  onSyncPrices?: () => void;
 }
 
 export const AppHeader: React.FC<AppHeaderProps> = ({
@@ -23,6 +23,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   onOpenResetModal,
   onOpenPriceHelp,
   onOpenAssistant,
+  isSyncing = false,
+  onSyncPrices,
 }) => {
   return (
     <header className="bg-white border-b border-[#E2E5DC] sticky top-0 z-40">
@@ -85,20 +87,24 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             >
               {getTranslation(lang, 'navDataSources')}
             </button>
-            <button
-              onClick={() => onSelectTab('csv')}
-              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap min-h-[44px] ${
-                activeTab === 'csv'
-                  ? 'bg-[#244638] text-white'
-                  : 'text-[#202821] hover:bg-[#F8F5EC]'
-              }`}
-            >
-              {getTranslation(lang, 'navCsvImport')}
-            </button>
           </nav>
 
           {/* Zone 3: Actions (Responsive, no wrap collision) */}
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+            {onSyncPrices && (
+              <button
+                onClick={onSyncPrices}
+                disabled={isSyncing}
+                className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold bg-emerald-700 hover:bg-emerald-800 disabled:opacity-60 text-white rounded-lg transition-colors flex items-center gap-1.5 min-h-[38px] sm:min-h-[44px] shrink-0 shadow-xs"
+                title={getTranslation(lang, 'btnSyncNow')}
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+                <span className="hidden md:inline">
+                  {isSyncing ? getTranslation(lang, 'syncingText') : getTranslation(lang, 'btnSyncNow')}
+                </span>
+              </button>
+            )}
+
             <button
               onClick={onOpenAssistant}
               className="p-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-[#244638] bg-[#F8F5EC] border border-[#E2E5DC] rounded-lg hover:bg-white transition-colors flex items-center gap-1 min-h-[38px] sm:min-h-[44px]"
@@ -180,16 +186,6 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             }`}
           >
             {getTranslation(lang, 'navDataSources')}
-          </button>
-          <button
-            onClick={() => onSelectTab('csv')}
-            className={`px-3 py-2 text-xs font-medium rounded-lg whitespace-nowrap shrink-0 min-h-[40px] ${
-              activeTab === 'csv'
-                ? 'bg-[#244638] text-white'
-                : 'text-[#202821] bg-[#F8F5EC]'
-            }`}
-          >
-            {getTranslation(lang, 'navCsvImport')}
           </button>
         </div>
       </div>

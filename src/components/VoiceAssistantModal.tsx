@@ -345,19 +345,6 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = ({
               'When was the peak price recorded?',
             ];
 
-      case 'csv':
-        return lang === 'mr'
-          ? [
-              'नवीन CSV फाइल कशी अपलोड करावी?',
-              'नमुना डेटा कसा रिसेट करावा?',
-              'CSV मधील आवश्यक स्तंभ कोणते?',
-            ]
-          : [
-              'How to import a new CSV file?',
-              'How to reset to demo data?',
-              'What columns are required in the CSV?',
-            ];
-
       case 'sources':
         return lang === 'mr'
           ? [
@@ -384,8 +371,6 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = ({
         return lang === 'mr' ? 'बाजार तुलना' : 'Compare';
       case 'trends':
         return lang === 'mr' ? 'भाव कल' : 'Trends';
-      case 'csv':
-        return lang === 'mr' ? 'CSV आयात' : 'CSV Import';
       case 'sources':
         return lang === 'mr' ? 'डेटा स्रोत' : 'Sources';
       default:
@@ -573,7 +558,7 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = ({
                           {act.type === 'view_trend' && `Trend: ${act.crop} (${act.market})`}
                           {act.type === 'toggle_language' && `Language: ${act.lang}`}
                           {act.type === 'open_price_help' && `Price measure help`}
-                          {act.type === 'download_template' && `Download CSV`}
+                          {act.type === 'sync_live_prices' && (lang === 'mr' ? 'अ‍ॅगमार्कनेट भाव सिंक केले' : 'Synced live APMC prices')}
                           {act.type === 'guide_step' && `Step ${act.step}`}
                         </span>
                       </div>
