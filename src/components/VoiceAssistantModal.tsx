@@ -189,7 +189,7 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = ({
         const response = await geminiAssistantService.sendMessage(
           newMessages,
           buildContext(),
-          'gemini-3.5-flash'
+          'gemini-3.8-flash'
         );
 
         replyText = response.reply;
@@ -349,13 +349,15 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = ({
         return lang === 'mr'
           ? [
               'हा भाव डेटा कुठून येतो?',
+              'कोणती शासकीय पोर्टल्स जोडलेली आहेत?',
+              'नवीन डेटा स्रोत कसा जोडायचा?',
               'डेटा किती दिवसांनी अपडेट होतो?',
-              'APMC बाजार म्हणजे काय?',
             ]
           : [
               'Where does this mandi data come from?',
+              'Which government portals are connected?',
+              'How do I add a new data source?',
               'How frequently is data updated?',
-              'What is an APMC mandi?',
             ];
 
       default:

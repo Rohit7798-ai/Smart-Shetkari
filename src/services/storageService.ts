@@ -1,7 +1,7 @@
 import { SEED_MARKET_PRICES } from '../data/seedData';
 import { MarketPriceRecord } from '../types/marketPrice';
 
-const STORAGE_KEY = 'smart_shetkari_market_prices_v1';
+const STORAGE_KEY = 'smart_shetkari_market_prices_v3';
 export const REFERENCE_DATE = '2026-10-12';
 
 /**
@@ -13,7 +13,7 @@ export const storageService = {
    */
   loadRecords(): MarketPriceRecord[] {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('smart_shetkari_market_prices_v2');
       if (!raw) {
         // Initialize with seed data
         this.saveRecords(SEED_MARKET_PRICES);
@@ -25,6 +25,15 @@ export const storageService = {
         console.warn('Storage data corrupted or empty, resetting to seed records.');
         this.saveRecords(SEED_MARKET_PRICES);
         return [...SEED_MARKET_PRICES];
+      }
+
+      // Ensure all expanded seed records are merged in if missing
+      const existingIds = new Set(parsed.map(r => r.recordId));
+      const missingSeeds = SEED_MARKET_PRICES.filter(s => !existingIds.has(s.recordId));
+      if (missingSeeds.length > 0) {
+        const merged = [...parsed, ...missingSeeds];
+        this.saveRecords(merged);
+        return merged;
       }
 
       return parsed;

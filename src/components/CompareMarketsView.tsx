@@ -12,6 +12,8 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { InlineAiSuggestions } from './InlineAiSuggestions';
+import { getCropMarathiShort } from '../utils/cropNames';
+import { getDistrictMarathi } from '../utils/districtNames';
 
 interface CompareMarketsViewProps {
   records: MarketPriceRecord[];
@@ -143,7 +145,7 @@ export const CompareMarketsView: React.FC<CompareMarketsViewProps> = ({
                   }`}
                 >
                   {crop}
-                  {lang === 'mr' && (crop === 'Onion' ? ' (कांदा)' : crop === 'Soybean' ? ' (सोयाबीन)' : crop === 'Cotton' ? ' (कापूस)' : crop === 'Tomato' ? ' (टोमॅटो)' : '')}
+                  {lang === 'mr' && getCropMarathiShort(crop) && ` (${getCropMarathiShort(crop)})`}
                 </button>
               );
             })}
@@ -174,7 +176,11 @@ export const CompareMarketsView: React.FC<CompareMarketsViewProps> = ({
                   }`}
                 >
                   {isSelected && <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-white" />}
-                  <span>{market}</span>
+                  <span>
+                    {lang === 'mr'
+                      ? (records.find(r => r.marketName === market)?.marketNameMr || market)
+                      : market}
+                  </span>
                 </button>
               );
             })}
@@ -252,7 +258,11 @@ export const CompareMarketsView: React.FC<CompareMarketsViewProps> = ({
                     {lang === 'mr' ? record.marketNameMr : record.marketName}
                   </h3>
                   <p className="text-xs text-[#667168] mt-0.5 break-words">
-                    {record.district} · {record.cropName}
+                    {lang === 'mr'
+                      ? `${getDistrictMarathi(record.district)} (${record.district})`
+                      : record.district}{' '}
+                    · {record.cropName}
+                    {lang === 'mr' && ` (${record.cropNameMr || getCropMarathiShort(record.cropName)})`}
                   </p>
                 </div>
 

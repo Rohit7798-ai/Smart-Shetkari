@@ -30,8 +30,13 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     <header className="bg-white border-b border-[#E2E5DC] sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2 sm:py-3">
         <div className="flex items-center justify-between gap-1.5 sm:gap-4 md:gap-8">
-          {/* Zone 1: Brand wordmark (single line, responsive sizing) */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 flex-1 sm:flex-initial">
+          {/* Zone 1: Brand wordmark (clickable home navigation) */}
+          <button
+            type="button"
+            onClick={() => onSelectTab('prices')}
+            className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 flex-1 sm:flex-initial text-left cursor-pointer hover:opacity-90 transition-opacity"
+            title={getTranslation(lang, 'navMarketPrices')}
+          >
             <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#244638] text-white flex items-center justify-center shrink-0">
               <Sprout className="w-4 h-4 sm:w-5 sm:h-5 text-[#F8F5EC]" />
             </div>
@@ -43,20 +48,10 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 {getTranslation(lang, 'appSubtitle')}
               </span>
             </div>
-          </div>
+          </button>
 
           {/* Zone 2: Navigation links (Desktop) */}
           <nav className="hidden lg:flex items-center gap-1">
-            <button
-              onClick={() => onSelectTab('prices')}
-              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap min-h-[44px] ${
-                activeTab === 'prices'
-                  ? 'bg-[#244638] text-white'
-                  : 'text-[#202821] hover:bg-[#F8F5EC]'
-              }`}
-            >
-              {getTranslation(lang, 'navMarketPrices')}
-            </button>
             <button
               onClick={() => onSelectTab('compare')}
               className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap min-h-[44px] ${
@@ -147,16 +142,6 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 
         {/* Mobile Navigation Bar (Edge-to-edge smooth scroll, no clipping) */}
         <div className="lg:hidden flex items-center gap-1.5 pt-2 pb-0.5 overflow-x-auto scrollbar-none border-t border-[#E2E5DC] mt-2 -mx-3 px-3">
-          <button
-            onClick={() => onSelectTab('prices')}
-            className={`px-3 py-2 text-xs font-medium rounded-lg whitespace-nowrap shrink-0 min-h-[40px] ${
-              activeTab === 'prices'
-                ? 'bg-[#244638] text-white'
-                : 'text-[#202821] bg-[#F8F5EC]'
-            }`}
-          >
-            {getTranslation(lang, 'navMarketPrices')}
-          </button>
           <button
             onClick={() => onSelectTab('compare')}
             className={`px-3 py-2 text-xs font-medium rounded-lg whitespace-nowrap shrink-0 min-h-[40px] ${

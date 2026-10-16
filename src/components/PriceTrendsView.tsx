@@ -10,6 +10,7 @@ import {
   Table as TableIcon,
 } from 'lucide-react';
 import { InlineAiSuggestions } from './InlineAiSuggestions';
+import { getCropMarathiShort } from '../utils/cropNames';
 
 interface PriceTrendsViewProps {
   records: MarketPriceRecord[];
@@ -208,7 +209,7 @@ export const PriceTrendsView: React.FC<PriceTrendsViewProps> = ({
             >
               {uniqueCrops.map(crop => (
                 <option key={crop} value={crop}>
-                  {crop} {lang === 'mr' && (crop === 'Onion' ? '(कांदा)' : crop === 'Soybean' ? '(सोयाबीन)' : crop === 'Cotton' ? '(कापूस)' : crop === 'Tomato' ? '(टोमॅटो)' : '')}
+                  {crop} {lang === 'mr' && getCropMarathiShort(crop) ? `(${getCropMarathiShort(crop)})` : ''}
                 </option>
               ))}
             </select>
@@ -224,11 +225,15 @@ export const PriceTrendsView: React.FC<PriceTrendsViewProps> = ({
               onChange={e => setSelectedMarket(e.target.value)}
               className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E2E5DC] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#244638] min-h-[44px]"
             >
-              {availableMarkets.map(mkt => (
-                <option key={mkt} value={mkt}>
-                  {mkt}
-                </option>
-              ))}
+              {availableMarkets.map(mkt => {
+                const rec = records.find(r => r.marketName === mkt);
+                const label = lang === 'mr' && rec?.marketNameMr ? `${rec.marketNameMr} (${mkt})` : mkt;
+                return (
+                  <option key={mkt} value={mkt}>
+                    {label}
+                  </option>
+                );
+              })}
             </select>
           </div>
 

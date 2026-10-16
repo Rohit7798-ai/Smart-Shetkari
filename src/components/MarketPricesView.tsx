@@ -15,6 +15,13 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { InlineAiSuggestions } from './InlineAiSuggestions';
+import { getCropMarathiShort } from '../utils/cropNames';
+import {
+  getDistrictDisplayName,
+  getDistrictMarathi,
+  getDistrictDivision,
+  DIVISIONS,
+} from '../utils/districtNames';
 
 interface MarketPricesViewProps {
   records: MarketPriceRecord[];
@@ -42,6 +49,8 @@ export const MarketPricesView: React.FC<MarketPricesViewProps> = ({
     sortBy: 'price_desc',
   });
 
+  const [selectedDivision, setSelectedDivision] = useState<string>('all');
+
   React.useEffect(() => {
     if (externalFilters) {
       setFilters(prev => ({
@@ -52,10 +61,15 @@ export const MarketPricesView: React.FC<MarketPricesViewProps> = ({
   }, [externalFilters]);
 
   const uniqueCrops = useMemo(() => storageService.getUniqueCrops(records), [records]);
-  const uniqueDistricts = useMemo(
-    () => storageService.getUniqueDistricts(records, filters.selectedCrop || undefined),
-    [records, filters.selectedCrop]
-  );
+
+  const uniqueDistricts = useMemo(() => {
+    let list = storageService.getUniqueDistricts(records, filters.selectedCrop || undefined);
+    if (selectedDivision !== 'all') {
+      list = list.filter(d => getDistrictDivision(d)?.en === selectedDivision);
+    }
+    return list;
+  }, [records, filters.selectedCrop, selectedDivision]);
+
   const uniqueMarkets = useMemo(
     () =>
       storageService.getUniqueMarkets(
@@ -75,6 +89,14 @@ export const MarketPricesView: React.FC<MarketPricesViewProps> = ({
           return false;
         }
 
+        // Division match
+        if (selectedDivision !== 'all') {
+          const div = getDistrictDivision(record.district);
+          if (div?.en !== selectedDivision) {
+            return false;
+          }
+        }
+
         // Search query (matches crop name or market name or district in EN or MR)
         if (filters.searchQuery.trim()) {
           const q = filters.searchQuery.toLowerCase().trim();
@@ -85,7 +107,8 @@ export const MarketPricesView: React.FC<MarketPricesViewProps> = ({
             record.marketName.toLowerCase().includes(q) ||
             record.marketNameMr.toLowerCase().includes(q);
           const matchesDistrict = record.district.toLowerCase().includes(q);
-          if (!matchesCrop && !matchesMarket && !matchesDistrict) {
+          const matchesDistrictMr = getDistrictMarathi(record.district).toLowerCase().includes(q);
+          if (!matchesCrop && !matchesMarket && !matchesDistrict && !matchesDistrictMr) {
             return false;
           }
         }
@@ -117,7 +140,7 @@ export const MarketPricesView: React.FC<MarketPricesViewProps> = ({
         }
         return 0;
       });
-  }, [records, filters]);
+  }, [records, filters, selectedDivision]);
 
   // Deduplicate to show the latest observation per market for the dashboard view
   const latestMarketRecords = useMemo(() => {
@@ -142,6 +165,7 @@ export const MarketPricesView: React.FC<MarketPricesViewProps> = ({
   );
 
   const resetFilters = () => {
+    setSelectedDivision('all');
     setFilters({
       searchQuery: '',
       selectedCrop: '',
@@ -156,7 +180,8 @@ export const MarketPricesView: React.FC<MarketPricesViewProps> = ({
     filters.searchQuery ||
     filters.selectedCrop ||
     filters.selectedDistrict ||
-    filters.selectedMarket
+    filters.selectedMarket ||
+    selectedDivision !== 'all'
   );
 
   return (
@@ -226,11 +251,48 @@ export const MarketPricesView: React.FC<MarketPricesViewProps> = ({
                   }`}
                 >
                   <span>{crop}</span>
-                  {lang === 'mr' && (
+                  {lang === 'mr' && getCropMarathiShort(crop) && (
                     <span className="opacity-80">
-                      ({crop === 'Onion' ? 'कांदा' : crop === 'Soybean' ? 'सोयाबीन' : crop === 'Cotton' ? 'कापूस' : crop === 'Tomato' ? 'टोमॅटो' : ''})
+                      ({getCropMarathiShort(crop)})
                     </span>
                   )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Region / Division Quick Selector */}
+        <div className="pt-2 border-t border-[#E2E5DC]">
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-xs font-semibold text-[#667168] uppercase tracking-wider">
+              {lang === 'mr' ? 'विभाग निवडा (Region)' : 'Select Region / Division'}
+            </label>
+            <span className="text-xs text-[#667168]">
+              {uniqueDistricts.length} {lang === 'mr' ? 'जिल्हे' : 'districts'} · {uniqueMarkets.length} {lang === 'mr' ? 'बाजारपेठा' : 'markets'}
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none -mx-1 px-1">
+            {DIVISIONS.map(div => {
+              const isSelected = selectedDivision === div.id;
+              return (
+                <button
+                  key={div.id}
+                  onClick={() => {
+                    setSelectedDivision(div.id);
+                    setFilters(prev => ({
+                      ...prev,
+                      selectedDistrict: '',
+                      selectedMarket: '',
+                    }));
+                  }}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-lg whitespace-nowrap shrink-0 transition-colors min-h-[36px] ${
+                    isSelected
+                      ? 'bg-[#244638] text-white shadow-xs'
+                      : 'bg-[#F8F5EC] text-[#202821] hover:bg-slate-200 border border-[#E2E5DC]'
+                  }`}
+                >
+                  {lang === 'mr' ? div.mr : div.en}
                 </button>
               );
             })}
@@ -258,7 +320,7 @@ export const MarketPricesView: React.FC<MarketPricesViewProps> = ({
               <option value="">{getTranslation(lang, 'allDistricts')}</option>
               {uniqueDistricts.map(dist => (
                 <option key={dist} value={dist}>
-                  {dist}
+                  {getDistrictDisplayName(dist, lang)}
                 </option>
               ))}
             </select>
@@ -275,11 +337,15 @@ export const MarketPricesView: React.FC<MarketPricesViewProps> = ({
               className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E2E5DC] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#244638] min-h-[42px] sm:min-h-[44px]"
             >
               <option value="">{getTranslation(lang, 'allMarkets')}</option>
-              {uniqueMarkets.map(mkt => (
-                <option key={mkt} value={mkt}>
-                  {mkt}
-                </option>
-              ))}
+              {uniqueMarkets.map(mkt => {
+                const rec = records.find(r => r.marketName === mkt);
+                const label = lang === 'mr' && rec?.marketNameMr ? `${rec.marketNameMr} (${mkt})` : mkt;
+                return (
+                  <option key={mkt} value={mkt}>
+                    {label}
+                  </option>
+                );
+              })}
             </select>
           </div>
 
@@ -430,7 +496,14 @@ export const MarketPricesView: React.FC<MarketPricesViewProps> = ({
                       </td>
 
                       {/* District */}
-                      <td className="py-3 px-4 text-[#667168]">{record.district}</td>
+                      <td className="py-3 px-4 text-[#667168]">
+                        <div className="font-medium text-[#202821]">
+                          {lang === 'mr' ? getDistrictMarathi(record.district) : record.district}
+                        </div>
+                        {lang === 'mr' && (
+                          <div className="text-[11px] text-[#667168]">{record.district}</div>
+                        )}
+                      </td>
 
                       {/* Modal Price */}
                       <td className="py-3 px-4 text-right">
@@ -533,8 +606,11 @@ export const MarketPricesView: React.FC<MarketPricesViewProps> = ({
                         {lang === 'mr' ? record.marketNameMr : record.marketName}
                       </h3>
                       <div className="text-xs text-[#667168] mt-0.5 break-words">
-                        {record.district} · {record.cropName}
-                        {lang === 'mr' && ` (${record.cropNameMr})`}
+                        {lang === 'mr'
+                          ? `${getDistrictMarathi(record.district)} (${record.district})`
+                          : record.district}{' '}
+                        · {record.cropName}
+                        {lang === 'mr' && ` (${record.cropNameMr || getCropMarathiShort(record.cropName)})`}
                       </div>
                     </div>
 
