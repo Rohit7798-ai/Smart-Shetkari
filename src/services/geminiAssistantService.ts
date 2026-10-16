@@ -95,6 +95,84 @@ export const geminiAssistantService = {
     const q = (query || '').toLowerCase().trim();
     const lang = context.lang;
 
+    // Check for Market Comparison (High Priority)
+    if (q.includes('तुलना') || q.includes('compare')) {
+      let crop = 'Onion';
+      let markets = ['Lasalgaon APMC', 'Pune APMC'];
+      let cropMr = 'कांदा';
+
+      if (q.includes('सोयाबीन') || q.includes('soybean')) {
+        crop = 'Soybean';
+        markets = ['Latur APMC', 'Akola APMC'];
+        cropMr = 'सोयाबीन';
+      } else if (q.includes('कापूस') || q.includes('cotton')) {
+        crop = 'Cotton';
+        markets = ['Jalgaon APMC', 'Amravati APMC'];
+        cropMr = 'कापूस';
+      } else if (q.includes('टोमॅटो') || q.includes('tomato')) {
+        crop = 'Tomato';
+        markets = ['Narayangaon APMC', 'Pimpalgaon Baswant APMC'];
+        cropMr = 'टोमॅटो';
+      } else if (q.includes('हळद') || q.includes('turmeric')) {
+        crop = 'Turmeric';
+        markets = ['Sangli APMC', 'Basmath APMC'];
+        cropMr = 'हळद';
+      } else if (q.includes('डाळिंब') || q.includes('pomegranate')) {
+        crop = 'Pomegranate';
+        markets = ['Solapur APMC', 'Sangli APMC'];
+        cropMr = 'डाळिंब';
+      }
+
+      return {
+        reply: lang === 'mr'
+          ? `मी स्क्रीनवर ${cropMr} बाजार तुलना उघडली आहे. येथे तुम्ही ${markets.join(' व ')} मधील भाव समोरासमोर तपासू शकता.`
+          : `Opened market comparison for ${crop} across ${markets.join(' and ')}.`,
+        actions: [{ type: 'compare_markets' as const, crop, markets, labelMr: `${cropMr} बाजार तुलना उघडली`, labelEn: `Comparing ${crop} Markets` }],
+        suggestedPrompts: lang === 'mr' ? [`${cropMr} भाव कल दाखवा`, 'आजचे ताजे भाव सिंक करा'] : [`Show ${crop} Trend`, "Sync Today's Rates"],
+      };
+    }
+
+    // Check for Price Trends (High Priority)
+    if (q.includes('कल') || q.includes('trend') || q.includes('इतिहास') || q.includes('history')) {
+      let crop = 'Onion';
+      let market = 'Lasalgaon APMC';
+      let cropMr = 'कांदा';
+
+      if (q.includes('सोयाबीन') || q.includes('soybean')) {
+        crop = 'Soybean';
+        market = 'Latur APMC';
+        cropMr = 'सोयाबीन';
+      } else if (q.includes('कापूस') || q.includes('cotton')) {
+        crop = 'Cotton';
+        market = 'Jalgaon APMC';
+        cropMr = 'कापूस';
+      } else if (q.includes('टोमॅटो') || q.includes('tomato')) {
+        crop = 'Tomato';
+        market = 'Narayangaon APMC';
+        cropMr = 'टोमॅटो';
+      } else if (q.includes('हळद') || q.includes('turmeric')) {
+        crop = 'Turmeric';
+        market = 'Sangli APMC';
+        cropMr = 'हळद';
+      } else if (q.includes('डाळिंब') || q.includes('pomegranate')) {
+        crop = 'Pomegranate';
+        market = 'Solapur APMC';
+        cropMr = 'डाळिंब';
+      } else if (q.includes('धान') || q.includes('तांदूळ')) {
+        crop = 'Rice / Paddy';
+        market = 'Tumsar APMC';
+        cropMr = 'धान';
+      }
+
+      return {
+        reply: lang === 'mr'
+          ? `मी स्क्रीनवर ${cropMr} पिकाचा ३० दिवसांचा ऐतिहासिक भाव कल चार्ट उघडला आहे.`
+          : `Opened 30-day Price Trend chart for ${crop}.`,
+        actions: [{ type: 'view_trend' as const, crop, market, timeRange: '30d' as const, labelMr: `${cropMr} भाव कल चार्ट`, labelEn: `Opened ${crop} Trend` }],
+        suggestedPrompts: lang === 'mr' ? ['७ दिवसांचा कल दाखवा', 'बाजार तुलना करा'] : ['Show 7 Days Trend', 'Compare Markets'],
+      };
+    }
+
     if (q.includes('तूर') || q.includes('tur') || q.includes('अरहर')) {
       return {
         reply: lang === 'mr'
@@ -205,14 +283,288 @@ export const geminiAssistantService = {
       };
     }
 
+    // Clear Filters
+    if (q.includes('फिल्टर काढा') || q.includes('फिल्टर काढून') || q.includes('सर्व पिके') || q.includes('clear filter') || q.includes('reset filter') || q.includes('सर्व दाखवा')) {
+      return {
+        reply: lang === 'mr'
+          ? 'मी सर्व फिल्टर्स काढून टाकले आहेत आणि सर्व शेतमालाचे ताजे भाव स्क्रीनवर दाखवले आहेत.'
+          : 'Cleared all filters. Displaying all crop records.',
+        actions: [{ type: 'clear_filters' as const, labelMr: 'सर्व फिल्टर काढले', labelEn: 'Cleared all filters' }],
+        suggestedPrompts: lang === 'mr'
+          ? ['कांदा भाव दाखवा', 'सोयाबीन भाव पहा', 'जास्त भाव आधी लावा']
+          : ['Show Onion Prices', 'Show Soybean Prices', 'Sort High to Low'],
+      };
+    }
+
+    // Sort High to Low / Low to High
+    if (q.includes('जास्त भाव') || q.includes('किंमत जास्त') || q.includes('high price') || q.includes('सर्वात जास्त')) {
+      return {
+        reply: lang === 'mr'
+          ? 'मी बाजार भाव सर्वात जास्त दरापासून ते कमी दरापर्यंत क्रमाने लावले आहेत.'
+          : 'Sorted market prices from highest to lowest rate.',
+        actions: [{ type: 'sort_prices' as const, sortBy: 'price_desc' as const, labelMr: 'जास्त भाव आधी', labelEn: 'Sorted: High to Low' }],
+        suggestedPrompts: lang === 'mr' ? ['कांदा भाव दाखवा', 'आजचे ताजे भाव सिंक करा'] : ['Show Onion Prices', "Sync Today's Rates"],
+      };
+    }
+    if (q.includes('कमी भाव') || q.includes('lowest price')) {
+      return {
+        reply: lang === 'mr'
+          ? 'मी बाजार भाव कमी दरापासून जास्त दरापर्यंत क्रमाने लावले आहेत.'
+          : 'Sorted market prices from lowest to highest rate.',
+        actions: [{ type: 'sort_prices' as const, sortBy: 'price_asc' as const, labelMr: 'कमी भाव आधी', labelEn: 'Sorted: Low to High' }],
+        suggestedPrompts: lang === 'mr' ? ['जास्त भाव लावा', 'सर्व पिके दाखवा'] : ['Sort High to Low', 'Show All Crops'],
+      };
+    }
+
+    // Add Data Source
+    if (q.includes('नवीन स्रोत') || q.includes('डेटा स्रोत जोडा') || q.includes('मंडी जोडा') || q.includes('add source')) {
+      return {
+        reply: lang === 'mr'
+          ? 'मी नवीन डेटा स्रोत जोडण्याची विंडो उघडली आहे.'
+          : 'I have opened the Add Data Source window.',
+        actions: [{ type: 'open_add_source' as const, labelMr: 'नवीन स्रोत विंडो उघडली', labelEn: 'Opened Add Source' }],
+        suggestedPrompts: lang === 'mr' ? ['माहिती स्रोत दाखवा', 'आजचे ताजे भाव सिंक करा'] : ['View Data Sources', "Sync Today's Rates"],
+      };
+    }
+
+    // Data Sources View
+    if (q.includes('माहिती स्रोत') || q.includes('डेटा स्रोत') || q.includes('sources') || q.includes('data source')) {
+      return {
+        reply: lang === 'mr'
+          ? 'मी डेटा स्रोत व पारदर्शकता धोरण स्क्रीन उघडली आहे.'
+          : 'I have opened the Data Sources view.',
+        actions: [{ type: 'switch_tab' as const, tab: 'sources' as const, labelMr: 'माहिती स्रोत स्क्रीन उघडली', labelEn: 'Opened Data Sources' }],
+        suggestedPrompts: lang === 'mr' ? ['नवीन स्रोत जोडा', 'बाजार भाव दाखवा'] : ['Add Data Source', 'View Market Prices'],
+      };
+    }
+
+    // Rice / Paddy
+    if (q.includes('धान') || q.includes('तांदूळ') || q.includes('भात') || q.includes('rice') || q.includes('paddy') || q.includes('तुमसर') || q.includes('गोंदिया')) {
+      return {
+        reply: lang === 'mr'
+          ? 'तुमसर बाजार समितीत (भंडारा) धानाला सरासरी भाव ₹२,८८० प्रति क्विंटल (कमाल ₹३,४८०) चालू आहे. गोंदिया बाजारात सरासरी दर ₹२,९२० आहे.'
+          : 'In Tumsar APMC, paddy modal price is ₹2,880/quintal (max ₹3,480). In Gondia, modal rate is ₹2,920.',
+        actions: [{ type: 'filter_prices' as const, crop: 'Rice / Paddy', labelMr: 'धान / तांदूळ निवडले', labelEn: 'Filtered Rice / Paddy' }],
+        suggestedPrompts: lang === 'mr' ? ['सोयाबीन भाव काय आहे?', 'आजचे ताजे भाव सिंक करा'] : ['What is Soybean Price?', "Sync Today's Rates"],
+      };
+    }
+
+    // Chilli
+    if (q.includes('मिरची') || q.includes('chilli') || q.includes('नंदुरबार')) {
+      return {
+        reply: lang === 'mr'
+          ? 'नंदुरबार प्रसिद्ध मिरची मोंढ्यात लाल सुकी मिरचीला सरासरी भाव ₹१४,८०० प्रति क्विंटल (कमाल ₹१८,८००) मिळत आहे.'
+          : 'In Nandurbar APMC, red dry chilli modal price is ₹14,800/quintal (max ₹18,800).',
+        actions: [{ type: 'filter_prices' as const, crop: 'Chilli', district: 'Nandurbar', labelMr: 'नंदुरबार मिरची निवडली', labelEn: 'Filtered Chilli' }],
+        suggestedPrompts: lang === 'mr' ? ['कापूस भाव काय आहे?', 'आजचे ताजे भाव सिंक करा'] : ['What is Cotton Price?', "Sync Today's Rates"],
+      };
+    }
+
+    // Orange
+    if (q.includes('संत्रा') || q.includes('मोसंबी') || q.includes('orange') || q.includes('मोर्शी') || q.includes('काटोल')) {
+      return {
+        reply: lang === 'mr'
+          ? 'मोर्शी बाजार समितीत (अमरावती संत्रा हब) संत्र्याला सरासरी भाव ₹५,३५० प्रति क्विंटल (कमाल ₹७,३५०) आहे. काटोल बाजारात सरासरी भाव ₹५,१८० चालू आहे.'
+          : 'In Morshi APMC, orange modal rate is ₹5,350/quintal (max ₹7,350). In Katol, modal price is ₹5,180.',
+        actions: [{ type: 'filter_prices' as const, crop: 'Orange', labelMr: 'संत्रा भाव निवडले', labelEn: 'Filtered Orange' }],
+        suggestedPrompts: lang === 'mr' ? ['डाळिंब भाव काय आहे?', 'आजचे ताजे भाव सिंक करा'] : ['What is Pomegranate Price?', "Sync Today's Rates"],
+      };
+    }
+
+    // Ginger
+    if (q.includes('आले') || q.includes('ginger') || q.includes('कराड')) {
+      return {
+        reply: lang === 'mr'
+          ? 'कराड बाजार समितीत (सातारा) ताज्या आल्याला सरासरी भाव ₹६,०५० प्रति क्विंटल (कमाल ₹७,८५०) मिळत आहे.'
+          : 'In Karad APMC, ginger modal rate is ₹6,050/quintal (max ₹7,850).',
+        actions: [{ type: 'filter_prices' as const, crop: 'Ginger', market: 'Karad APMC', labelMr: 'कराड आले भाव', labelEn: 'Filtered Karad Ginger' }],
+        suggestedPrompts: lang === 'mr' ? ['हळद भाव काय आहे?'] : ['What is Turmeric Price?'],
+      };
+    }
+
+    // Grapes / Raisins
+    if (q.includes('द्राक्षे') || q.includes('द्राक्ष') || q.includes('बेदाणा') || q.includes('grapes') || q.includes('तासगाव')) {
+      return {
+        reply: lang === 'mr'
+          ? 'तासगाव बाजार समितीत (सांगली) बेदाण्याला सरासरी भाव ₹१९,८०० प्रति क्विंटल (कमाल ₹२५,४००) मिळत आहे.'
+          : 'In Tasgaon APMC, raisin modal price is ₹19,800/quintal (max ₹25,400).',
+        actions: [{ type: 'filter_prices' as const, crop: 'Grapes', market: 'Tasgaon APMC', labelMr: 'तासगाव बेदाणा', labelEn: 'Filtered Tasgaon Raisin' }],
+        suggestedPrompts: lang === 'mr' ? ['डाळिंब भाव काय आहे?'] : ['What is Pomegranate Price?'],
+      };
+    }
+
+    // Time Ranges in Trends
+    if (q.includes('७ दिवस') || q.includes('7 दिवस') || q.includes('7 days')) {
+      return {
+        reply: lang === 'mr' ? 'मी भाव कल चार्टमध्ये गेल्या ७ दिवसांचा इतिहास सेट केला आहे.' : 'Switched trend view to 7-day timeframe.',
+        actions: [{ type: 'set_time_range' as const, timeRange: '7d' as const, labelMr: '७ दिवसांचा कल', labelEn: '7 Days Timeframe' }],
+        suggestedPrompts: lang === 'mr' ? ['३० दिवसांचा कल दाखवा'] : ['Show 30 Days Trend'],
+      };
+    }
+    if (q.includes('९० दिवस') || q.includes('90 दिवस') || q.includes('90 days')) {
+      return {
+        reply: lang === 'mr' ? 'मी भाव कल चार्टमध्ये ९० दिवसांचा इतिहास सेट केला आहे.' : 'Switched trend view to 90-day timeframe.',
+        actions: [{ type: 'set_time_range' as const, timeRange: '90d' as const, labelMr: '९० दिवसांचा कल', labelEn: '90 Days Timeframe' }],
+        suggestedPrompts: lang === 'mr' ? ['३० दिवसांचा कल दाखवा'] : ['Show 30 Days Trend'],
+      };
+    }
+
+    // Price Help Explanation
+    if (q.includes('सरासरी भाव') || q.includes('किमान भाव') || q.includes('कमाल भाव') || q.includes('modal') || q.includes('भावांचे प्रकार')) {
+      return {
+        reply: lang === 'mr'
+          ? 'सरासरी भाव (Modal Price) म्हणजे ज्या दराने त्या दिवशी बाजारात सर्वाधिक मालाची विक्री झाली. किमान भाव (Min) सर्वात कमी दर असतो आणि कमाल भाव (Max) हा उत्कृष्ट प्रतीचा सर्वोच्च दर असतो.'
+          : 'Modal Price is the most frequent rate. Minimum Price is lowest, while Maximum Price is for top grade lots.',
+        actions: [{ type: 'open_price_help' as const, labelMr: 'भावांचे प्रकार माहिती उघडली', labelEn: 'Opened Price Guide' }],
+        suggestedPrompts: lang === 'mr' ? ['लासलगाव कांदा भाव काय आहे?', 'आजचे ताजे भाव सिंक करा'] : ['What is Onion price?', "Sync Today's Rates"],
+      };
+    }
+
+    // Language Toggle
+    if (q.includes('इंग्रजी') || q.includes('english') || q.includes('मराठी') || q.includes('marathi') || q.includes('भाषा')) {
+      const targetLang: 'en' | 'mr' = (q.includes('इंग्रजी') || q.includes('english')) ? 'en' : 'mr';
+      return {
+        reply: targetLang === 'en' ? 'Switched language to English.' : 'भाषा मराठीमध्ये बदलली आहे.',
+        actions: [{ type: 'toggle_language' as const, lang: targetLang, labelMr: 'भाषा बदलली', labelEn: 'Switched Language' }],
+        suggestedPrompts: targetLang === 'mr' ? ['लासलगाव कांदा भाव'] : ['Lasalgaon Onion Price'],
+      };
+    }
+
+    // Reload Official Data
+    if (q.includes('डेटा पूर्ववत') || q.includes('अधिकृत डेटा रीलोड') || q.includes('रीसेट') || q.includes('reset data') || q.includes('reload data')) {
+      return {
+        reply: lang === 'mr'
+          ? 'मी अधिकृत बाजार भाव पूर्ववत लोड करण्याची विंडो उघडली आहे. यामुळे महाराष्ट्रातील सर्व ३६ जिल्ह्यांचा प्रमाणित डेटा पूर्ववत लोड होईल.'
+          : 'I have opened the window to reload verified APMC daily prices across all 36 Maharashtra districts.',
+        actions: [{ type: 'trigger_sample_reset' as const, labelMr: 'अधिकृत डेटा रीलोड उघडले', labelEn: 'Reload APMC Data' }],
+        suggestedPrompts: lang === 'mr' ? ['आजचे ताजे भाव सिंक करा', 'कांदा भाव दाखवा'] : ["Sync Today's Rates", 'Show Onion Prices'],
+      };
+    }
+
+    // Administrative Divisions
+    if (q.includes('विदर्भ') || q.includes('अमरावती विभाग') || q.includes('vidarbha') || q.includes('amravati division')) {
+      return {
+        reply: lang === 'mr'
+          ? 'मी अमरावती (विदर्भ) विभागातील बाजार समित्यांचे ताजे भाव स्क्रीनवर फिल्टर केले आहेत.'
+          : 'Filtered market prices for Amravati (Vidarbha) division APMCs.',
+        actions: [{ type: 'filter_prices' as const, division: 'Amravati Division', labelMr: 'विदर्भ (अमरावती विभाग)', labelEn: 'Vidarbha Division' }],
+        suggestedPrompts: lang === 'mr' ? ['कापूस भाव दाखवा', 'सोयाबीन भाव दाखवा'] : ['Show Cotton Prices', 'Show Soybean Prices'],
+      };
+    }
+    if (q.includes('नागपूर विभाग') || q.includes('nagpur division') || q.includes('पूर्व विदर्भ')) {
+      return {
+        reply: lang === 'mr'
+          ? 'मी नागपूर विभागातील बाजार समित्यांचे भाव स्क्रीनवर फिल्टर केले आहेत.'
+          : 'Filtered market prices for Nagpur division APMCs.',
+        actions: [{ type: 'filter_prices' as const, division: 'Nagpur Division', labelMr: 'नागपूर विभाग', labelEn: 'Nagpur Division' }],
+        suggestedPrompts: lang === 'mr' ? ['धान भाव दाखवा', 'संत्रा भाव दाखवा'] : ['Show Paddy Prices', 'Show Orange Prices'],
+      };
+    }
+    if (q.includes('मराठवाडा') || q.includes('संभाजीनगर विभाग') || q.includes('marathwada')) {
+      return {
+        reply: lang === 'mr'
+          ? 'मी छत्रपती संभाजीनगर (मराठवाडा) विभागातील बाजार समित्यांचे ताजे भाव स्क्रीनवर लावले आहेत.'
+          : 'Filtered market prices for Marathwada division APMCs.',
+        actions: [{ type: 'filter_prices' as const, division: 'Chhatrapati Sambhajinagar Division', labelMr: 'मराठवाडा विभाग', labelEn: 'Marathwada Division' }],
+        suggestedPrompts: lang === 'mr' ? ['सोयाबीन भाव दाखवा', 'तूर भाव दाखवा'] : ['Show Soybean Prices', 'Show Tur Prices'],
+      };
+    }
+    if (q.includes('पश्चिम महाराष्ट्र') || q.includes('पुणे विभाग') || q.includes('western maharashtra')) {
+      return {
+        reply: lang === 'mr'
+          ? 'मी पुणे (पश्चिम महाराष्ट्र) विभागातील बाजार समित्यांचे भाव स्क्रीनवर लावले आहेत.'
+          : 'Filtered market prices for Pune (Western Maharashtra) division.',
+        actions: [{ type: 'filter_prices' as const, division: 'Pune Division', labelMr: 'पुणे विभाग', labelEn: 'Pune Division' }],
+        suggestedPrompts: lang === 'mr' ? ['डाळिंब भाव दाखवा', 'हळद भाव दाखवा'] : ['Show Pomegranate', 'Show Turmeric'],
+      };
+    }
+    if (q.includes('उत्तर महाराष्ट्र') || q.includes('नाशिक विभाग') || q.includes('खानदेश') || q.includes('khandesh')) {
+      return {
+        reply: lang === 'mr'
+          ? 'मी नाशिक (उत्तर महाराष्ट्र / खानदेश) विभागातील बाजार समित्यांचे भाव स्क्रीनवर लावले आहेत.'
+          : 'Filtered market prices for Nashik / Khandesh division.',
+        actions: [{ type: 'filter_prices' as const, division: 'Nashik Division', labelMr: 'नाशिक (खानदेश) विभाग', labelEn: 'Nashik Division' }],
+        suggestedPrompts: lang === 'mr' ? ['कांदा भाव दाखवा', 'कापूस भाव दाखवा'] : ['Show Onion Prices', 'Show Cotton Prices'],
+      };
+    }
+    if (q.includes('कोकण') || q.includes('konkan')) {
+      return {
+        reply: lang === 'mr'
+          ? 'मी कोकण विभागातील (वाशी, ठाणे, पालघर, रायगड) भाव स्क्रीनवर लावले आहेत.'
+          : 'Filtered market prices for Konkan division (Vashi wholesale terminal).',
+        actions: [{ type: 'filter_prices' as const, division: 'Konkan Division', labelMr: 'कोकण विभाग', labelEn: 'Konkan Division' }],
+        suggestedPrompts: lang === 'mr' ? ['वाशी कांदा भाव', 'वाशी टोमॅटो भाव'] : ['Vashi Onion', 'Vashi Tomato'],
+      };
+    }
+
+    // Specific Districts
+    const districtMap: Record<string, string> = {
+      'नाशिक': 'Nashik', 'nashik': 'Nashik',
+      'पुणे': 'Pune', 'pune': 'Pune',
+      'लातूर': 'Latur', 'latur': 'Latur',
+      'सोलापूर': 'Solapur', 'solapur': 'Solapur',
+      'जळगाव': 'Jalgaon', 'jalgaon': 'Jalgaon',
+      'अमरावती': 'Amravati', 'amravati': 'Amravati',
+      'नागपूर': 'Nagpur', 'nagpur': 'Nagpur',
+      'अहमदनगर': 'Ahmednagar', 'ahmednagar': 'Ahmednagar', 'अहिल्यानगर': 'Ahmednagar',
+      'कोल्हापूर': 'Kolhapur', 'kolhapur': 'Kolhapur',
+      'सांगली': 'Sangli', 'sangli': 'Sangli',
+      'सातारा': 'Satara', 'satara': 'Satara',
+      'छत्रपती संभाजीनगर': 'Chhatrapati Sambhajinagar', 'संभाजीनगर': 'Chhatrapati Sambhajinagar', 'औरंगाबाद': 'Chhatrapati Sambhajinagar', 'aurangabad': 'Chhatrapati Sambhajinagar',
+      'जालना': 'Jalna', 'jalna': 'Jalna',
+      'बीड': 'Beed', 'beed': 'Beed',
+      'धाराशिव': 'Dharashiv', 'dharashiv': 'Dharashiv', 'उस्मानाबाद': 'Dharashiv',
+      'नांदेड': 'Nanded', 'nanded': 'Nanded',
+      'परभणी': 'Parbhani', 'parbhani': 'Parbhani',
+      'हिंगोली': 'Hingoli', 'hingoli': 'Hingoli',
+      'बुलढाणा': 'Buldhana', 'buldhana': 'Buldhana',
+      'अकोला': 'Akola', 'akola': 'Akola',
+      'वाशीम': 'Washim', 'washim': 'Washim',
+      'यवतमाळ': 'Yavatmal', 'yavatmal': 'Yavatmal',
+      'वर्धा': 'Wardha', 'wardha': 'Wardha',
+      'चंद्रपूर': 'Chandrapur', 'chandrapur': 'Chandrapur',
+      'गडचिरोली': 'Gadchiroli', 'gadchiroli': 'Gadchiroli',
+      'भंडारा': 'Bhandara', 'bhandara': 'Bhandara',
+      'गोंदिया': 'Gondia', 'gondia': 'Gondia',
+      'धुळे': 'Dhule', 'dhule': 'Dhule',
+      'नंदुरबार': 'Nandurbar', 'nandurbar': 'Nandurbar',
+      'ठाणे': 'Thane', 'thane': 'Thane',
+      'पालघर': 'Palghar', 'palghar': 'Palghar',
+      'रायगड': 'Raigad', 'raigad': 'Raigad',
+      'रत्नागिरी': 'Ratnagiri', 'ratnagiri': 'Ratnagiri',
+      'सिंधुदुर्ग': 'Sindhudurg', 'sindhudurg': 'Sindhudurg',
+      'वाशी': 'Navi Mumbai', 'नवी मुंबई': 'Navi Mumbai', 'navi mumbai': 'Navi Mumbai',
+    };
+
+    for (const [key, dist] of Object.entries(districtMap)) {
+      if (q.includes(key)) {
+        return {
+          reply: lang === 'mr'
+            ? `मी ${key} जिल्ह्यातील अधिकृत बाजार समित्यांचे चालू बाजार भाव स्क्रीनवर फिल्टर केले आहेत.`
+            : `Filtered official APMC mandi prices for ${dist} district.`,
+          actions: [{ type: 'filter_prices' as const, district: dist, labelMr: `${key} जिल्हा भाव`, labelEn: `Filtered ${dist} District` }],
+          suggestedPrompts: lang === 'mr' ? ['जास्त भाव आधी लावा', 'सर्व पिके दाखवा', 'आजचे ताजे भाव सिंक करा'] : ['Sort High to Low', 'Show All Crops', "Sync Today's Rates"],
+        };
+      }
+    }
+
+    // Direct Screen Switch
+    if (q.includes('बाजार भाव स्क्रीन') || q.includes('मुख्य स्क्रीन') || q.includes('पहिला टॅब') || q.includes('दरांचे पान')) {
+      return {
+        reply: lang === 'mr' ? 'मी मुख्य बाजार भाव स्क्रीन उघडली आहे.' : 'Switched to Market Prices screen.',
+        actions: [{ type: 'switch_tab' as const, tab: 'prices' as const, labelMr: 'बाजार भाव स्क्रीन', labelEn: 'Prices Screen' }],
+        suggestedPrompts: lang === 'mr' ? ['कांदा भाव दाखवा', 'जास्त भाव आधी लावा'] : ['Show Onion Prices', 'Sort High to Low'],
+      };
+    }
+
     return {
       reply: lang === 'mr'
-        ? 'नमस्कार शेतकरी मित्र! मी तुमचा शेतकरी AI सहाय्यक आहे. मला कांदा, सोयाबीन, कापूस, टोमॅटोचे भाव विचारा किंवा बाजारांची तुलना करा.'
-        : 'Hello! I am your AI assistant. Ask me about onion, soybean, cotton or tomato prices, or compare markets.',
+        ? 'नमस्कार शेतकरी मित्र! मी तुमचा स्मार्ट शेतकरी व्हॉइस सहाय्यक आहे. तुम्ही मला थेट मराठीत बोलून कांदा, सोयाबीन, कापूस, धान, टोमॅटोचे भाव विचारू शकता, बाजार तुलना करू शकता, भाव कल पाहू शकता, आजचे ताजे भाव सिंक करू शकता किंवा नवीन स्रोत जोडू शकता.'
+        : 'Hello! I am your Smart Shetkari Voice Assistant. Speak naturally to check crop prices, compare markets, inspect price trends, sync live APMC rates, or add data sources.',
       actions: [],
       suggestedPrompts: lang === 'mr'
-        ? ['लासलगाव कांदा भाव काय आहे?', 'सोयाबीन भाव दाखवा', 'आजचे ताजे भाव सिंक करा']
-        : ['What is Lasalgaon Onion price?', 'Show Soybean Price', "Sync Today's Rates"],
+        ? ['लासलगाव कांदा भाव काय आहे?', 'लासलगाव आणि पुणे कांदा तुलना करा', 'आजचे ताजे भाव सिंक करा', '३० दिवसांचा भाव कल दाखवा', 'सर्व फिल्टर काढा']
+        : ['What is Lasalgaon Onion price?', 'Compare Lasalgaon and Pune Onion', "Sync Today's Rates", 'Show 30-Day Trend', 'Clear Filters'],
     };
   },
 

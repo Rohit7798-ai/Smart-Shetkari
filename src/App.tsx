@@ -37,12 +37,20 @@ export default function App() {
   const [targetMarket, setTargetMarket] = useState<string>('Lasalgaon APMC');
   const [compareMarkets, setCompareMarkets] = useState<string[]>([]);
   const [trendTimeRange, setTrendTimeRange] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
-  const [dashboardFilters, setDashboardFilters] = useState<Partial<FilterState>>({});
+  const [dashboardFilters, setDashboardFilters] = useState<Partial<FilterState>>({
+    searchQuery: '',
+    selectedCrop: 'Onion',
+    selectedDistrict: '',
+    selectedMarket: '',
+    selectedDivision: 'all',
+    sortBy: 'price_desc',
+  });
 
   // Modals state
   const [isResetModalOpen, setIsResetModalOpen] = useState<boolean>(false);
   const [isPriceHelpOpen, setIsPriceHelpOpen] = useState<boolean>(false);
   const [isAssistantOpen, setIsAssistantOpen] = useState<boolean>(false);
+  const [isAddSourceOpen, setIsAddSourceOpen] = useState<boolean>(false);
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
 
   const handleTriggerAssistantPrompt = (prompt: string) => {
@@ -109,12 +117,37 @@ export default function App() {
 
       case 'filter_prices':
         setActiveTab('prices');
+        setDashboardFilters(prev => ({
+          ...prev,
+          selectedCrop: action.crop !== undefined ? action.crop : (prev.selectedCrop || ''),
+          selectedDistrict: action.district !== undefined ? action.district : (prev.selectedDistrict || ''),
+          selectedMarket: action.market !== undefined ? action.market : (prev.selectedMarket || ''),
+          selectedDivision: action.division !== undefined ? action.division : (prev.selectedDivision || 'all'),
+          searchQuery: action.search !== undefined ? action.search : (prev.searchQuery || ''),
+          sortBy: action.sortBy !== undefined ? action.sortBy : (prev.sortBy || 'price_desc'),
+        }));
+        break;
+
+      case 'clear_filters':
+        setActiveTab('prices');
         setDashboardFilters({
-          selectedCrop: action.crop !== undefined ? action.crop : undefined,
-          selectedDistrict: action.district !== undefined ? action.district : undefined,
-          selectedMarket: action.market !== undefined ? action.market : undefined,
-          searchQuery: action.search !== undefined ? action.search : undefined,
+          selectedCrop: '',
+          selectedDistrict: '',
+          selectedMarket: '',
+          selectedDivision: 'all',
+          searchQuery: '',
+          sortBy: 'price_desc',
         });
+        break;
+
+      case 'sort_prices':
+        setActiveTab('prices');
+        if (action.sortBy) {
+          setDashboardFilters(prev => ({
+            ...prev,
+            sortBy: action.sortBy,
+          }));
+        }
         break;
 
       case 'compare_markets':
@@ -132,6 +165,18 @@ export default function App() {
         if (action.crop) setTargetCrop(action.crop);
         if (action.market) setTargetMarket(action.market);
         if (action.timeRange) setTrendTimeRange(action.timeRange);
+        break;
+
+      case 'set_time_range':
+        if (action.timeRange) {
+          setTrendTimeRange(action.timeRange);
+          setActiveTab('trends');
+        }
+        break;
+
+      case 'open_add_source':
+        setActiveTab('sources');
+        setIsAddSourceOpen(true);
         break;
 
       case 'toggle_language':
@@ -167,7 +212,7 @@ export default function App() {
   };
 
   const handleResetConfirmed = () => {
-    const defaultData = storageService.resetToSampleData();
+    const defaultData = storageService.resetToOfficialData();
     setRecords(defaultData);
     setTargetCrop('Onion');
     setTargetMarket('Lasalgaon APMC');
@@ -196,7 +241,7 @@ export default function App() {
         onSyncPrices={handleSyncPrices}
       />
 
-      {/* 2. Persistent Demo Data & Freshness Banner */}
+      {/* 2. Persistent Live Mandi Data & Freshness Banner */}
       <DataStatusBanner
         records={records}
         lang={lang}
@@ -242,7 +287,12 @@ export default function App() {
         )}
 
         {activeTab === 'sources' && (
-          <DataSourcesView records={records} lang={lang} />
+          <DataSourcesView
+            records={records}
+            lang={lang}
+            externalOpenAddModal={isAddSourceOpen}
+            onCloseAddModal={() => setIsAddSourceOpen(false)}
+          />
         )}
       </main>
 

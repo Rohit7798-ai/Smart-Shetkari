@@ -172,8 +172,11 @@ class VoiceService {
     const cleanText = text
       .replace(/\*\*(.*?)\*\*/g, '$1')
       .replace(/\*(.*?)\*/g, '$1')
+      .replace(/#+\s*/g, '')
+      .replace(/[•\-\*]\s+/g, '')
+      .replace(/₹\s*([0-9,]+)/g, '$1 रुपये')
       .replace(/₹/g, ' रुपये ')
-      .replace(/APMC/gi, 'ए पी एम सी')
+      .replace(/APMC/gi, 'बाजार समिती')
       .replace(/[\n\r]+/g, ' ')
       .trim();
 

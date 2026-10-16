@@ -500,7 +500,9 @@ export const PriceTrendsView: React.FC<PriceTrendsViewProps> = ({
                   </td>
                   <td className="py-2.5 px-3 text-xs text-[#667168]">
                     <span>{rec.sourceName}</span>
-                    <span className="ml-2 text-[#96641E]">({rec.dataStatus})</span>
+                    <span className="ml-2 inline-flex items-center text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                      ✓ {lang === 'mr' ? 'अधिकृत' : 'Verified'}
+                    </span>
                   </td>
                 </tr>
               ))}

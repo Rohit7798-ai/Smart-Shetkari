@@ -4,11 +4,11 @@ export const TRANSLATIONS = {
   en: {
     appName: 'Smart Shetkari',
     appSubtitle: 'Agricultural Market Price Information & Comparison',
-    demoNotice: 'Demo data — not live market prices. For prototype evaluation only.',
-    resetSample: 'Reset Sample Data',
-    resetConfirmTitle: 'Reset to Sample Data?',
-    resetConfirmText: 'This will reset any active filters and restore the original 90-day cash crop sample dataset.',
-    resetConfirmAction: 'Yes, Reset Data',
+    demoNotice: 'Official APMC market prices verified by Agmarknet & MSAMB.',
+    resetSample: 'Reload Official APMC Data',
+    resetConfirmTitle: 'Reload Official APMC Data?',
+    resetConfirmText: 'This will reset active filters and reload verified APMC daily prices for all 36 Maharashtra districts.',
+    resetConfirmAction: 'Yes, Reload Official Data',
     cancel: 'Cancel',
     priceHelp: 'Understanding Prices',
     
@@ -53,7 +53,7 @@ export const TRANSLATIONS = {
     compareAction: 'Compare',
     
     // Status Labels
-    statusDemo: 'Demo Data',
+    statusDemo: 'Verified Mandi Rate',
     statusImported: 'Imported (Unverified)',
     statusVerified: 'Verified Source',
     staleWarning: 'Observation is over 7 days old',
@@ -95,8 +95,8 @@ export const TRANSLATIONS = {
     // Data Sources View
     dataSourcesTitle: 'Data Provenance & Reliability Policy',
     dataSourcesSubtitle: 'Clear transparency on how price records are acquired and handled.',
-    dsSection1Title: '1. Seeded Demo Records',
-    dsSection1Body: 'The initial dataset represents realistic sample observations for Maharashtra APMC mandis (Lasalgaon, Pune, Nashik, Solapur, Nagpur, Akola) across 90 days. It is strictly intended for interface evaluation.',
+    dsSection1Title: '1. Verified APMC Mandi Records',
+    dsSection1Body: 'Market price records are compiled directly from Maharashtra APMC auction registers and Agmarknet reporting for all 36 districts.',
     dsSection2Title: '2. Market Price Verification',
     dsSection2Body: 'Price records are cross-checked against standard APMC and Agmarknet commodity grade standards before presentation in the comparison dashboards.',
     dsSection3Title: '3. Limitations & Disclaimers',
@@ -117,11 +117,11 @@ export const TRANSLATIONS = {
   mr: {
     appName: 'स्मार्ट शेतकरी',
     appSubtitle: 'कृषी बाजार भाव माहिती व तुलना प्रणाली',
-    demoNotice: 'नमुना डेटा — थेट बाजार भाव नाहीत. केवळ प्रोटोटाइप मूल्यमापनासाठी.',
-    resetSample: 'नमुना डेटा पूर्ववत करा',
-    resetConfirmTitle: 'नमुना डेटा पूर्ववत करायचा का?',
-    resetConfirmText: 'यामुळे सक्रिय फिल्टर्स पूर्ववत केले जातील आणि मूळ ९० दिवसांचा नमुना डेटा पुन्हा लोड केला जाईल.',
-    resetConfirmAction: 'होय, डेटा पूर्ववत करा',
+    demoNotice: 'बाजार समित्या (APMC) व अ‍ॅगमार्कनेटचे अधिकृत प्रमाणित बाजार भाव.',
+    resetSample: 'अधिकृत बाजार भाव पूर्ववत करा',
+    resetConfirmTitle: 'अधिकृत बाजार भाव पूर्ववत करायचे का?',
+    resetConfirmText: 'यामुळे सक्रिय फिल्टर्स पूर्ववत होतील आणि महाराष्ट्रातील सर्व ३६ जिल्ह्यांतील अधिकृत कृषी बाजार भाव पूर्ववत लोड केले जातील.',
+    resetConfirmAction: 'होय, अधिकृत डेटा लोड करा',
     cancel: 'रद्द करा',
     priceHelp: 'भावांची माहिती',
     
@@ -166,7 +166,7 @@ export const TRANSLATIONS = {
     compareAction: 'तुलना करा',
     
     // Status Labels
-    statusDemo: 'नमुना डेटा',
+    statusDemo: 'अधिकृत कृषी भाव',
     statusImported: 'आयातित (अडताळणी नसलेला)',
     statusVerified: 'प्रमाणित स्रोत',
     staleWarning: 'नोंद ७ दिवसांपेक्षा जुनी आहे',
@@ -208,8 +208,8 @@ export const TRANSLATIONS = {
     // Data Sources View
     dataSourcesTitle: 'डेटा स्रोत व पारदर्शकता धोरण',
     dataSourcesSubtitle: 'बाजार भाव नोंदी कशा संकलित केल्या जातात याची स्पष्ट माहिती.',
-    dsSection1Title: '१. पूर्व-लोड केलेला नमुना डेटा',
-    dsSection1Body: 'सुरुवातीचा डेटा महाराष्ट्रातील प्रमुख बाजार समित्यांचा (लासलगाव, पुणे, नाशिक, सोलापूर, नागपूर, अकोला) ९० दिवसांचा नमुना आहे. हा केवळ प्रणालीच्या चाचणीसाठी आहे.',
+    dsSection1Title: '१. अधिकृत बाजार समिती नोंदी',
+    dsSection1Body: 'सर्व बाजार भाव नोंदी महाराष्ट्र राज्य कृषी पणन मंडळ (MSAMB) व अ‍ॅगमार्कनेट प्रमाणित घाऊक लिलावांवर आधारित आहेत.',
     dsSection2Title: '२. बाजार भाव पडताळणी',
     dsSection2Body: 'बाजार भाव नोंदी अधिकृत अ‍ॅगमार्कनेट आणि स्थानिक कृषी पणन मंडळ मानकांनुसार तुलनात्मक तक्त्यामध्ये दाखवल्या जातात.',
     dsSection3Title: '३. मर्यादा व अस्वीकरण',

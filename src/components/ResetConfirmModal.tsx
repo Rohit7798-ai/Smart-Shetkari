@@ -1,7 +1,7 @@
 import React from 'react';
 import { Language } from '../types/marketPrice';
 import { getTranslation } from '../utils/translations';
-import { AlertTriangle, X } from 'lucide-react';
+import { RotateCcw, X } from 'lucide-react';
 
 interface ResetConfirmModalProps {
   isOpen: boolean;
@@ -27,9 +27,9 @@ export const ResetConfirmModal: React.FC<ResetConfirmModalProps> = ({
     >
       <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl border border-[#E2E5DC]">
         <div className="flex items-center justify-between pb-3 border-b border-[#E2E5DC]">
-          <div className="flex items-center gap-2 text-[#96641E]">
-            <AlertTriangle className="w-5 h-5 shrink-0" />
-            <h2 id="reset-modal-title" className="text-lg font-semibold text-slate-900">
+          <div className="flex items-center gap-2 text-[#244638]">
+            <RotateCcw className="w-5 h-5 shrink-0 text-[#244638]" />
+            <h2 id="reset-modal-title" className="text-lg font-semibold text-[#244638]">
               {getTranslation(lang, 'resetConfirmTitle')}
             </h2>
           </div>
@@ -58,7 +58,7 @@ export const ResetConfirmModal: React.FC<ResetConfirmModalProps> = ({
               onConfirm();
               onClose();
             }}
-            className="px-4 py-2.5 min-h-[44px] text-sm font-medium text-white bg-[#D96C50] rounded-lg hover:bg-[#c2593f] transition-colors"
+            className="px-4 py-2.5 min-h-[44px] text-sm font-semibold text-white bg-[#244638] rounded-lg hover:bg-[#18352B] transition-colors"
           >
             {getTranslation(lang, 'resetConfirmAction')}
           </button>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Language, NavTab } from '../types/marketPrice';
 import { getTranslation } from '../utils/translations';
-import { Globe, RotateCcw, HelpCircle, Sprout, MessageSquare, RefreshCw } from 'lucide-react';
+import { Globe, RotateCcw, HelpCircle, Sprout, RefreshCw, Mic, Sparkles } from 'lucide-react';
 
 interface AppHeaderProps {
   activeTab: NavTab;
@@ -27,152 +27,180 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   onSyncPrices,
 }) => {
   return (
-    <header className="bg-white border-b border-[#E2E5DC] sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2 sm:py-3">
-        <div className="flex items-center justify-between gap-1.5 sm:gap-4 md:gap-8">
-          {/* Zone 1: Brand wordmark (clickable home navigation) */}
+    <header className="bg-white border-b border-[#E2E5DC] sticky top-0 z-40 shadow-xs">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6">
+        <div className="flex items-center justify-between h-16 sm:h-18 gap-3 sm:gap-6">
+          
+          {/* Zone 1: Brand Logo & Title */}
           <button
             type="button"
             onClick={() => onSelectTab('prices')}
-            className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 flex-1 sm:flex-initial text-left cursor-pointer hover:opacity-90 transition-opacity"
+            className="flex items-center gap-2.5 shrink-0 text-left cursor-pointer group"
             title={getTranslation(lang, 'navMarketPrices')}
           >
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#244638] text-white flex items-center justify-center shrink-0">
-              <Sprout className="w-4 h-4 sm:w-5 sm:h-5 text-[#F8F5EC]" />
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#244638] text-white flex items-center justify-center shrink-0 shadow-xs group-hover:bg-[#18352B] transition-colors">
+              <Sprout className="w-5 h-5 text-emerald-300" />
             </div>
-            <div className="flex flex-col min-w-0">
-              <span className="text-sm sm:text-lg md:text-xl font-bold tracking-tight text-[#244638] truncate block">
+            <div className="flex flex-col">
+              <span className="text-base sm:text-lg md:text-xl font-bold tracking-tight text-[#1F3D2F] leading-tight">
                 {getTranslation(lang, 'appName')}
               </span>
-              <span className="text-[11px] text-[#667168] hidden sm:inline whitespace-nowrap">
-                {getTranslation(lang, 'appSubtitle')}
+              <span className="text-[11px] text-[#667168] hidden sm:block leading-none mt-0.5">
+                {lang === 'mr' ? 'कृषी बाजार भाव व तुलना प्रणाली' : 'Agricultural Mandi Price System'}
               </span>
             </div>
           </button>
 
-          {/* Zone 2: Navigation links (Desktop) */}
-          <nav className="hidden lg:flex items-center gap-1">
+          {/* Zone 2: Desktop Navigation Bar (Centered & Clean) */}
+          <nav className="hidden lg:flex items-center gap-1 bg-[#F8F5EC] p-1 rounded-xl border border-[#E2E5DC]">
+            <button
+              onClick={() => onSelectTab('prices')}
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+                activeTab === 'prices'
+                  ? 'bg-[#244638] text-white shadow-xs'
+                  : 'text-[#202821] hover:text-[#244638] hover:bg-white/60'
+              }`}
+            >
+              {getTranslation(lang, 'navMarketPrices')}
+            </button>
             <button
               onClick={() => onSelectTab('compare')}
-              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap min-h-[44px] ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === 'compare'
-                  ? 'bg-[#244638] text-white'
-                  : 'text-[#202821] hover:bg-[#F8F5EC]'
+                  ? 'bg-[#244638] text-white shadow-xs'
+                  : 'text-[#202821] hover:text-[#244638] hover:bg-white/60'
               }`}
             >
               {getTranslation(lang, 'navCompareMarkets')}
             </button>
             <button
               onClick={() => onSelectTab('trends')}
-              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap min-h-[44px] ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === 'trends'
-                  ? 'bg-[#244638] text-white'
-                  : 'text-[#202821] hover:bg-[#F8F5EC]'
+                  ? 'bg-[#244638] text-white shadow-xs'
+                  : 'text-[#202821] hover:text-[#244638] hover:bg-white/60'
               }`}
             >
               {getTranslation(lang, 'navPriceTrends')}
             </button>
             <button
               onClick={() => onSelectTab('sources')}
-              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap min-h-[44px] ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === 'sources'
-                  ? 'bg-[#244638] text-white'
-                  : 'text-[#202821] hover:bg-[#F8F5EC]'
+                  ? 'bg-[#244638] text-white shadow-xs'
+                  : 'text-[#202821] hover:text-[#244638] hover:bg-white/60'
               }`}
             >
               {getTranslation(lang, 'navDataSources')}
             </button>
           </nav>
 
-          {/* Zone 3: Actions (Responsive, no wrap collision) */}
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          {/* Zone 3: Actions (Compact, Harmonious & Uncluttered) */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Live Sync Action */}
             {onSyncPrices && (
               <button
                 onClick={onSyncPrices}
                 disabled={isSyncing}
-                className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold bg-emerald-700 hover:bg-emerald-800 disabled:opacity-60 text-white rounded-lg transition-colors flex items-center gap-1.5 min-h-[38px] sm:min-h-[44px] shrink-0 shadow-xs"
+                className="px-2.5 sm:px-3 py-2 text-xs font-semibold bg-[#244638] hover:bg-[#18352B] disabled:opacity-60 text-white rounded-lg transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
                 title={getTranslation(lang, 'btnSyncNow')}
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-                <span className="hidden md:inline">
-                  {isSyncing ? getTranslation(lang, 'syncingText') : getTranslation(lang, 'btnSyncNow')}
+                <span className="hidden sm:inline">
+                  {isSyncing ? (lang === 'mr' ? 'सिंक...' : 'Syncing...') : (lang === 'mr' ? 'ताजे भाव' : 'Sync')}
                 </span>
               </button>
             )}
 
+            {/* Featured Voice AI Button */}
             <button
               onClick={onOpenAssistant}
-              className="p-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-[#244638] bg-[#F8F5EC] border border-[#E2E5DC] rounded-lg hover:bg-white transition-colors flex items-center gap-1 min-h-[38px] sm:min-h-[44px]"
-              title={lang === 'mr' ? 'मदतनीस' : 'Chatbot'}
+              className="px-2.5 sm:px-3 py-2 text-xs font-bold text-[#1F4E39] bg-emerald-50 border border-emerald-300 rounded-lg hover:bg-emerald-100 transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+              title={lang === 'mr' ? 'व्हॉइस मदतनीस (बोलून ९०%+ ॲप चालवा)' : 'Voice Assistant (Speak to control app)'}
             >
-              <MessageSquare className="w-4 h-4 text-[#244638] shrink-0" />
-              <span className="hidden sm:inline">
-                {lang === 'mr' ? 'मदतनीस' : 'Chatbot'}
-              </span>
+              <Mic className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+              <span>{lang === 'mr' ? 'व्हॉइस AI' : 'Voice AI'}</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse hidden sm:inline" />
             </button>
 
+            {/* Price Help Guide (Icon Tooltip) */}
             <button
               onClick={onOpenPriceHelp}
-              className="p-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-[#244638] bg-[#F8F5EC] border border-[#E2E5DC] rounded-lg hover:bg-white transition-colors flex items-center gap-1 min-h-[38px] sm:min-h-[44px]"
+              className="p-2 text-slate-600 hover:text-[#244638] hover:bg-slate-100 rounded-lg border border-slate-200 transition-colors cursor-pointer"
               title={getTranslation(lang, 'priceHelp')}
+              aria-label={getTranslation(lang, 'priceHelp')}
             >
-              <HelpCircle className="w-4 h-4 shrink-0 text-[#244638]" />
-              <span className="hidden sm:inline">{getTranslation(lang, 'priceHelp')}</span>
+              <HelpCircle className="w-4 h-4" />
             </button>
 
+            {/* Reset Official Data (Icon Tooltip) */}
             <button
               onClick={onOpenResetModal}
-              className="hidden md:flex p-2 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-slate-600 hover:text-slate-900 border border-[#E2E5DC] rounded-lg hover:bg-[#F8F5EC] transition-colors items-center gap-1.5 min-h-[44px]"
+              className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg border border-slate-200 transition-colors cursor-pointer hidden md:flex"
               title={getTranslation(lang, 'resetSample')}
+              aria-label={getTranslation(lang, 'resetSample')}
             >
-              <RotateCcw className="w-4 h-4 shrink-0" />
-              <span>{getTranslation(lang, 'resetSample')}</span>
+              <RotateCcw className="w-4 h-4" />
             </button>
 
+            {/* Language Toggle Badge */}
             <button
               onClick={onToggleLang}
-              className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold bg-[#244638] text-white rounded-lg hover:bg-[#18352B] transition-colors flex items-center gap-1 min-h-[38px] sm:min-h-[44px] shrink-0"
+              className="px-2.5 py-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
+              title={lang === 'en' ? 'मराठीत बदला' : 'Switch to English'}
               aria-label="Toggle language"
             >
-              <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-              <span>{lang === 'en' ? 'मराठी' : 'English'}</span>
+              <Globe className="w-3.5 h-3.5 text-slate-500" />
+              <span>{lang === 'en' ? 'मराठी' : 'EN'}</span>
             </button>
           </div>
+
         </div>
 
-        {/* Mobile Navigation Bar (Edge-to-edge smooth scroll, no clipping) */}
-        <div className="lg:hidden flex items-center gap-1.5 pt-2 pb-0.5 overflow-x-auto scrollbar-none border-t border-[#E2E5DC] mt-2 -mx-3 px-3">
+        {/* Mobile Navigation Bar (Clean row below brand on screens < lg) */}
+        <div className="lg:hidden flex items-center gap-1 pb-2 pt-1 overflow-x-auto no-scrollbar border-t border-[#E2E5DC] -mx-3 px-3">
+          <button
+            onClick={() => onSelectTab('prices')}
+            className={`px-3 py-1.5 text-xs font-semibold rounded-lg whitespace-nowrap transition-colors shrink-0 ${
+              activeTab === 'prices'
+                ? 'bg-[#244638] text-white'
+                : 'text-slate-700 bg-[#F8F5EC] hover:bg-slate-200'
+            }`}
+          >
+            {getTranslation(lang, 'navMarketPrices')}
+          </button>
           <button
             onClick={() => onSelectTab('compare')}
-            className={`px-3 py-2 text-xs font-medium rounded-lg whitespace-nowrap shrink-0 min-h-[40px] ${
+            className={`px-3 py-1.5 text-xs font-semibold rounded-lg whitespace-nowrap transition-colors shrink-0 ${
               activeTab === 'compare'
                 ? 'bg-[#244638] text-white'
-                : 'text-[#202821] bg-[#F8F5EC]'
+                : 'text-slate-700 bg-[#F8F5EC] hover:bg-slate-200'
             }`}
           >
             {getTranslation(lang, 'navCompareMarkets')}
           </button>
           <button
             onClick={() => onSelectTab('trends')}
-            className={`px-3 py-2 text-xs font-medium rounded-lg whitespace-nowrap shrink-0 min-h-[40px] ${
+            className={`px-3 py-1.5 text-xs font-semibold rounded-lg whitespace-nowrap transition-colors shrink-0 ${
               activeTab === 'trends'
                 ? 'bg-[#244638] text-white'
-                : 'text-[#202821] bg-[#F8F5EC]'
+                : 'text-slate-700 bg-[#F8F5EC] hover:bg-slate-200'
             }`}
           >
             {getTranslation(lang, 'navPriceTrends')}
           </button>
           <button
             onClick={() => onSelectTab('sources')}
-            className={`px-3 py-2 text-xs font-medium rounded-lg whitespace-nowrap shrink-0 min-h-[40px] ${
+            className={`px-3 py-1.5 text-xs font-semibold rounded-lg whitespace-nowrap transition-colors shrink-0 ${
               activeTab === 'sources'
                 ? 'bg-[#244638] text-white'
-                : 'text-[#202821] bg-[#F8F5EC]'
+                : 'text-slate-700 bg-[#F8F5EC] hover:bg-slate-200'
             }`}
           >
             {getTranslation(lang, 'navDataSources')}
           </button>
         </div>
+
       </div>
     </header>
   );

@@ -35,5 +35,6 @@ export interface FilterState {
   selectedState: string;
   selectedDistrict: string;
   selectedMarket: string;
+  selectedDivision?: string;
   sortBy: 'price_desc' | 'price_asc' | 'date_desc' | 'market_asc';
 }

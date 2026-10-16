@@ -13,6 +13,7 @@ import {
   Calendar,
   AlertTriangle,
   RotateCcw,
+  CheckCircle,
 } from 'lucide-react';
 import { InlineAiSuggestions } from './InlineAiSuggestions';
 import { getCropMarathiShort } from '../utils/cropNames';
@@ -55,8 +56,17 @@ export const MarketPricesView: React.FC<MarketPricesViewProps> = ({
     if (externalFilters) {
       setFilters(prev => ({
         ...prev,
-        ...externalFilters,
+        ...Object.fromEntries(
+          Object.entries(externalFilters).filter(([_, v]) => v !== undefined)
+        ),
+        searchQuery:
+          externalFilters.searchQuery !== undefined
+            ? externalFilters.searchQuery
+            : prev.searchQuery || '',
       }));
+      if (externalFilters.selectedDivision !== undefined) {
+        setSelectedDivision(externalFilters.selectedDivision || 'all');
+      }
     }
   }, [externalFilters]);
 
@@ -84,6 +94,11 @@ export const MarketPricesView: React.FC<MarketPricesViewProps> = ({
   const filteredRecords = useMemo(() => {
     return records
       .filter(record => {
+        // Exclude any dummy / demo records
+        if (record.dataStatus === 'demo' || record.recordId.toLowerCase().includes('dummy')) {
+          return false;
+        }
+
         // Crop match
         if (filters.selectedCrop && record.cropName !== filters.selectedCrop) {
           return false;
@@ -98,16 +113,18 @@ export const MarketPricesView: React.FC<MarketPricesViewProps> = ({
         }
 
         // Search query (matches crop name or market name or district in EN or MR)
-        if (filters.searchQuery.trim()) {
-          const q = filters.searchQuery.toLowerCase().trim();
+        const searchQuery = (filters.searchQuery || '').trim();
+        if (searchQuery) {
+          const q = searchQuery.toLowerCase();
           const matchesCrop =
-            record.cropName.toLowerCase().includes(q) ||
-            record.cropNameMr.toLowerCase().includes(q);
+            (record.cropName && record.cropName.toLowerCase().includes(q)) ||
+            (record.cropNameMr && record.cropNameMr.toLowerCase().includes(q));
           const matchesMarket =
-            record.marketName.toLowerCase().includes(q) ||
-            record.marketNameMr.toLowerCase().includes(q);
-          const matchesDistrict = record.district.toLowerCase().includes(q);
-          const matchesDistrictMr = getDistrictMarathi(record.district).toLowerCase().includes(q);
+            (record.marketName && record.marketName.toLowerCase().includes(q)) ||
+            (record.marketNameMr && record.marketNameMr.toLowerCase().includes(q));
+          const matchesDistrict = Boolean(record.district && record.district.toLowerCase().includes(q));
+          const distMr = getDistrictMarathi(record.district);
+          const matchesDistrictMr = Boolean(distMr && distMr.toLowerCase().includes(q));
           if (!matchesCrop && !matchesMarket && !matchesDistrict && !matchesDistrictMr) {
             return false;
           }
@@ -205,12 +222,12 @@ export const MarketPricesView: React.FC<MarketPricesViewProps> = ({
             <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
-              value={filters.searchQuery}
+              value={filters.searchQuery || ''}
               onChange={e => setFilters(prev => ({ ...prev, searchQuery: e.target.value }))}
               placeholder={getTranslation(lang, 'searchPlaceholder')}
               className="w-full pl-10 pr-9 py-2.5 text-sm bg-[#F8F5EC] border border-[#E2E5DC] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#244638] focus:bg-white transition-colors"
             />
-            {filters.searchQuery && (
+            {Boolean(filters.searchQuery) && (
               <button
                 onClick={() => setFilters(prev => ({ ...prev, searchQuery: '' }))}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
@@ -541,25 +558,14 @@ export const MarketPricesView: React.FC<MarketPricesViewProps> = ({
 
                       {/* Source & Status */}
                       <td className="py-3 px-4 text-xs text-[#667168]">
-                        <div className="truncate max-w-[140px]" title={record.sourceName}>
+                        <div className="truncate max-w-[140px] font-medium text-[#202821]" title={record.sourceName}>
                           {record.sourceName}
                         </div>
-                        <div className="text-[11px]">
-                          {record.dataStatus === 'demo' && (
-                            <span className="text-[#96641E] font-medium">
-                              {getTranslation(lang, 'statusDemo')}
-                            </span>
-                          )}
-                          {record.dataStatus === 'imported_unverified' && (
-                            <span className="text-blue-700 font-medium">
-                              {getTranslation(lang, 'statusImported')}
-                            </span>
-                          )}
-                          {record.dataStatus === 'verified' && (
-                            <span className="text-emerald-700 font-medium">
-                              {getTranslation(lang, 'statusVerified')}
-                            </span>
-                          )}
+                        <div className="text-[11px] mt-0.5">
+                          <span className="inline-flex items-center gap-1 text-emerald-700 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/60">
+                            <CheckCircle className="w-3 h-3 text-emerald-600 shrink-0" />
+                            {getTranslation(lang, 'statusVerified')}
+                          </span>
                         </div>
                       </td>
 
@@ -661,21 +667,10 @@ export const MarketPricesView: React.FC<MarketPricesViewProps> = ({
                       </span>
                     </div>
                     <div className="shrink-0 text-[11px]">
-                      {record.dataStatus === 'demo' && (
-                        <span className="text-[#96641E] font-medium bg-[#FFF0D9] px-2 py-0.5 rounded">
-                          {getTranslation(lang, 'statusDemo')}
-                        </span>
-                      )}
-                      {record.dataStatus === 'imported_unverified' && (
-                        <span className="text-blue-700 font-medium bg-blue-50 px-2 py-0.5 rounded">
-                          {getTranslation(lang, 'statusImported')}
-                        </span>
-                      )}
-                      {record.dataStatus === 'verified' && (
-                        <span className="text-emerald-700 font-medium bg-emerald-50 px-2 py-0.5 rounded">
-                          {getTranslation(lang, 'statusVerified')}
-                        </span>
-                      )}
+                      <span className="inline-flex items-center gap-1 text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60">
+                        <CheckCircle className="w-3 h-3 text-emerald-600 shrink-0" />
+                        {getTranslation(lang, 'statusVerified')}
+                      </span>
                     </div>
                   </div>
 

@@ -25,12 +25,20 @@ import { AddDataSourceModal } from './AddDataSourceModal';
 interface DataSourcesViewProps {
   records: MarketPriceRecord[];
   lang: Language;
+  externalOpenAddModal?: boolean;
+  onCloseAddModal?: () => void;
 }
 
-export const DataSourcesView: React.FC<DataSourcesViewProps> = ({ records, lang }) => {
+export const DataSourcesView: React.FC<DataSourcesViewProps> = ({
+  records,
+  lang,
+  externalOpenAddModal,
+  onCloseAddModal,
+}) => {
   const [sources, setSources] = useState<DataSourceItem[]>(() => dataSourceService.getAllSources());
   const [activeCategory, setActiveCategory] = useState<string>('all');
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [internalAddModalOpen, setInternalAddModalOpen] = useState(false);
+  const isAddModalOpen = externalOpenAddModal ?? internalAddModalOpen;
   const [pingingId, setPingingId] = useState<string | null>(null);
   const [pingResults, setPingResults] = useState<Record<string, { online: boolean; latencyMs: number }>>({});
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -113,7 +121,7 @@ export const DataSourcesView: React.FC<DataSourcesViewProps> = ({ records, lang 
         </div>
 
         <button
-          onClick={() => setIsAddModalOpen(true)}
+          onClick={() => setInternalAddModalOpen(true)}
           className="px-4 py-2.5 bg-[#244638] text-white text-xs sm:text-sm font-semibold rounded-lg hover:bg-[#18352B] transition-colors shadow-xs flex items-center justify-center gap-2 shrink-0 min-h-[44px]"
         >
           <PlusCircle className="w-4 h-4 text-emerald-300" />
@@ -500,7 +508,10 @@ export const DataSourcesView: React.FC<DataSourcesViewProps> = ({ records, lang 
       {/* Add Data Source Modal */}
       <AddDataSourceModal
         isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
+        onClose={() => {
+          setInternalAddModalOpen(false);
+          if (onCloseAddModal) onCloseAddModal();
+        }}
         lang={lang}
         onSourceAdded={handleSourceAdded}
       />

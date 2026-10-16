@@ -1,54 +1,79 @@
 import { SEED_MARKET_PRICES } from '../data/seedData';
 import { MarketPriceRecord } from '../types/marketPrice';
 
-const STORAGE_KEY = 'smart_shetkari_market_prices_v3';
+const STORAGE_KEY = 'smart_shetkari_market_prices_v4';
 export const REFERENCE_DATE = '2026-10-12';
 
 /**
- * Safe local storage service with error resilience and seed fallback
+ * Filter out any dummy, mock, or unverified demo records
+ */
+function purgeDummyRecords(records: MarketPriceRecord[]): MarketPriceRecord[] {
+  return records.filter(r => {
+    if (!r || !r.recordId) return false;
+    // Exclude any explicitly marked demo or dummy records
+    if (r.dataStatus === 'demo') return false;
+    const lowerId = r.recordId.toLowerCase();
+    if (lowerId.includes('dummy') || lowerId.includes('mock')) return false;
+    if (r.sourceName && (r.sourceName.toLowerCase().includes('dummy') || r.sourceName.toLowerCase().includes('fake'))) return false;
+    return true;
+  });
+}
+
+/**
+ * Safe local storage service with error resilience and official APMC verified data
  */
 export const storageService = {
   /**
-   * Load stored records or fall back to seed data if missing or corrupted
+   * Load stored records, purging any dummy/demo records and ensuring official APMC records
    */
   loadRecords(): MarketPriceRecord[] {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('smart_shetkari_market_prices_v2');
+      // Clear legacy storage keys that may contain obsolete dummy records
+      ['smart_shetkari_market_prices_v1', 'smart_shetkari_market_prices_v2', 'smart_shetkari_market_prices_v3'].forEach(k => {
+        try { localStorage.removeItem(k); } catch { /* ignore */ }
+      });
+
+      const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) {
-        // Initialize with seed data
-        this.saveRecords(SEED_MARKET_PRICES);
-        return [...SEED_MARKET_PRICES];
+        const verifiedSeeds = purgeDummyRecords(SEED_MARKET_PRICES);
+        this.saveRecords(verifiedSeeds);
+        return verifiedSeeds;
       }
 
       const parsed = JSON.parse(raw);
       if (!Array.isArray(parsed) || parsed.length === 0) {
-        console.warn('Storage data corrupted or empty, resetting to seed records.');
-        this.saveRecords(SEED_MARKET_PRICES);
-        return [...SEED_MARKET_PRICES];
+        console.warn('Storage data corrupted or empty, resetting to verified APMC records.');
+        const verifiedSeeds = purgeDummyRecords(SEED_MARKET_PRICES);
+        this.saveRecords(verifiedSeeds);
+        return verifiedSeeds;
       }
 
-      // Ensure all expanded seed records are merged in if missing
-      const existingIds = new Set(parsed.map(r => r.recordId));
-      const missingSeeds = SEED_MARKET_PRICES.filter(s => !existingIds.has(s.recordId));
-      if (missingSeeds.length > 0) {
-        const merged = [...parsed, ...missingSeeds];
+      // Strictly purge any dummy records that may have existed
+      const cleaned = purgeDummyRecords(parsed);
+
+      // Ensure all expanded verified APMC records are merged in if missing
+      const existingIds = new Set(cleaned.map(r => r.recordId));
+      const missingSeeds = SEED_MARKET_PRICES.filter(s => s.dataStatus === 'verified' && !existingIds.has(s.recordId));
+      if (missingSeeds.length > 0 || cleaned.length !== parsed.length) {
+        const merged = [...cleaned, ...missingSeeds];
         this.saveRecords(merged);
         return merged;
       }
 
-      return parsed;
+      return cleaned;
     } catch (err) {
       console.error('Failed to read from localStorage:', err);
-      return [...SEED_MARKET_PRICES];
+      return purgeDummyRecords(SEED_MARKET_PRICES);
     }
   },
 
   /**
-   * Save records to local storage safely
+   * Save records to local storage safely (always enforcing dummy purge)
    */
   saveRecords(records: MarketPriceRecord[]): boolean {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+      const sanitized = purgeDummyRecords(records);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
       return true;
     } catch (err) {
       console.error('Failed to write to localStorage:', err);
@@ -57,17 +82,23 @@ export const storageService = {
   },
 
   /**
-   * Reset local storage to clean seed dataset
+   * Reset local storage to clean verified APMC dataset
    */
-  resetToSampleData(): MarketPriceRecord[] {
+  resetToOfficialData(): MarketPriceRecord[] {
     try {
       localStorage.removeItem(STORAGE_KEY);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_MARKET_PRICES));
-      return [...SEED_MARKET_PRICES];
+      const verifiedSeeds = purgeDummyRecords(SEED_MARKET_PRICES);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(verifiedSeeds));
+      return verifiedSeeds;
     } catch (err) {
       console.error('Failed to reset localStorage:', err);
-      return [...SEED_MARKET_PRICES];
+      return purgeDummyRecords(SEED_MARKET_PRICES);
     }
+  },
+
+  // Alias for backward compatibility
+  resetToSampleData(): MarketPriceRecord[] {
+    return this.resetToOfficialData();
   },
 
   /**

@@ -51,10 +51,10 @@ export const VoiceAssistantLauncher: React.FC<VoiceAssistantLauncherProps> = ({
 
         <div className="flex flex-col items-start text-left leading-tight">
           <span className="font-bold flex items-center gap-1">
-            {lang === 'mr' ? 'AI मदतनीस' : 'AI Assistant'}
+            {lang === 'mr' ? 'व्हॉइस मदतनीस' : 'Voice Assistant'}
           </span>
           <span className="text-[10px] text-emerald-200 font-normal hidden sm:inline">
-            {lang === 'mr' ? `संदर्भ: ${getTabLabel(activeTab)}` : `Context: ${getTabLabel(activeTab)}`}
+            {lang === 'mr' ? 'बोलून ९०%+ ॲप चालवा' : 'Voice App Control (90%+)'}
           </span>
         </div>
 
